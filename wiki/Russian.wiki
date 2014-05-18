@@ -1,0 +1,40 @@
+Этот проект позволяет пилотам отображать специфичные для Ardupilot данные на экране аппы Turnigy 9X и ее клонов без использования дополнительного радиоканала телеметрии на базе 3DR Radio или XBee. Для владельцев 3DR Radio или XBee появляется возможность отображения телеметрии как на наземной станции, так и на экране аппы.
+
+Проект содержит две прошивки: для аппы Turnigy 9X и для Arduino Pro Mini.
+Прошивка для Turnigy создана на основе популярной [https://code.google.com/p/er9x/ er9x] прошивки r812 (добавлен экран №5 отображения данных, принимаемых от Ardupilot, остальное без изменений)
+Прошивка для Arduino основана на проекте [https://github.com/vizual54/APM-Mavlink-to-FrSky APM-Mavlink-to-FrSky for Taranis]
+
+
+Ardupilot -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky
+http://110.imagebam.com/download/hg0nXB05H14ymeS-nfpRwg/32716/327152898/mavlink-frsky.jpg
+http://110.imagebam.com/download/vNVQdCwoCPpNa_ut1CptaQ/32715/327149802/displays.jpg
+
+===Необходимое оборудование===
+
+[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=26869&aff=233755 Arduino Pro Mini] рекомендуем версию с питанием 5В, но версия 3.3В тоже работает.
+
+[http://www.ebay.com/sch/i.html?_odkw=usb+ttl&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR12.TRC2.A0.H0.Xusb+ttl+5v&_nkw=usb+ttl+5v&_sacat=0 USB->TTL 5V convertor] на чипах FTDI, PL2303 или других. Для Arduinio требуется распаянного сигнала DTE. Не забудьте USB кабель.
+
+[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=27990&aff=233755 USBasp AVR programmer] для прошивки аппы Turnigy 9X. Можете использовать любой другой программатор, которым Вы привыкли пользоваться.
+
+[http://www.ebay.com/sch/i.html?_odkw=usbasp+programmer&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xusbasp+adapter+6pin&_nkw=usbasp+adapter+6pin&_sacat=0 10 pin to 6 pin adapter for USBasp] Я пользуюсь таким переходником для быстрого подсоединения программатора к аппе.
+
+[http://www.ebay.com/sch/i.html?_odkw=telemetry+cable+for+apm&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xtelemetry+cable+apm&_nkw=telemetry+cable+apm&_sacat=0 Telemetry cable for APM] Для тех, кто любит чтобы все было аккуратно и на разъемах, могу предложить приобрести такой кабель. Остальные могут припаять 4 провода к разъему телеметрии APM с обратной стороны.
+
+===Конфигурация оборудования, на которой производилось тестирование===
+[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=31544&aff=233755 Turnigy 9XR Transmitter Mode 2] (подойдет любая аппа клона Turnigy 9X)
+У вас должен быть сделан FrSky hardware MOD. Наиболее оптимальный, на мой взгляд, способ описан [http://forum.rcdesign.ru/blogs/105113/blog16284.html здесь]. Если этот способ вас не устраивает, то привожу ссылки на другие разнообразные инструкции (на английском языке)
+[http://er9x.googlecode.com/svn/trunk/doc/FrSky%20Telemetry%20%20details.pdf 1] [http://code.google.com/p/gruvin9x/wiki/FrskyInterfacing 2] [http://er9x.googlecode.com/svn/trunk/doc/TelemetryMods.pdf 3] [http://www.flickr.com/photos/erezraviv/5830896454/in/photostream 4] [http://er9x.googlecode.com/svn/trunk/doc/FRSKYTelemetry.pdf 5]
+
+[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=14355&aff=233755 FrSky DJT and D8R-IIplus modules] Приемник (или любой другой FrSky с поддеркой телеметрии)
+
+[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=37328&aff=233755 Ardupilot compatible Flight Controller v2.52] (или любой другой клон, поддерживающий прошивку [http://ardupilot.com/ APM])
+
+===Необходимое программное обеспечение===
+[https://code.google.com/p/eepe/ eePe] для прошивки аппы и сохранения/редактирования настроек.
+
+[http://russemotto.com/xloader/ XLoader] (или другая программа, которая позволяет заливать HEX файлы в Arduino) ИЛИ
+[http://arduino.cc/en/Main/Software Arduino IDE] для прошивки Arduino из исходных кодов скетча. При использовании Arduino IDE не забудьте сделать импорт [https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/source/mavlink-driver/libraries библиотек]
+
+===Скачать последние версии прошивок===
+https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin
