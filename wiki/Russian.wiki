@@ -1,3 +1,6 @@
+[https://code.google.com/p/er9x-frsky-mavlink/ English] [https://code.google.com/p/er9x-frsky-mavlink/wiki/Russian Russian]
+
+
 Этот проект позволяет пилотам отображать специфичные для Ardupilot данные на экране аппы Turnigy 9X и ее клонов без использования дополнительного радиоканала телеметрии на базе 3DR Radio или XBee. Для владельцев 3DR Radio или XBee появляется возможность отображения телеметрии как на наземной станции, так и на экране аппы.
 
 Проект содержит две прошивки: для аппы Turnigy 9X и для Arduino Pro Mini.
