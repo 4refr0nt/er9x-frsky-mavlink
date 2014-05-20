@@ -6044,7 +6044,7 @@ void dispA1A2Dbl( uint8_t y )
   if (g_model.frsky.channels[0].opt.alarm.ratio)
   {
       lcd_puts_Pleft( y, PSTR("A1="));
-      putsTelemValue( 3*FW, y=FH, frskyTelemetry[0].value, 0,  /*blink|*/DBLSIZE|LEFT, 1 ) ;
+      putsTelemValue( 3*FW, y-FH, frskyTelemetry[0].value, 0,  /*blink|*/DBLSIZE|LEFT, 1 ) ;
   }
   if (g_model.frsky.channels[1].opt.alarm.ratio)
   {
