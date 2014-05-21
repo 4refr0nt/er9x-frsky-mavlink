@@ -10,8 +10,8 @@
 
 
 Ardupilot -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky
-http://110.imagebam.com/download/hg0nXB05H14ymeS-nfpRwg/32716/327152898/mavlink-frsky.jpg
-http://111.imagebam.com/download/AVee9fsN-tlR2-AjRBWrrQ/32785/327846313/displays.jpg
+http://110.imagebam.com/download/366VpSAnf9JgHMUPLp2C1Q/32797/327961161/mavlink-frsky.jpg
+http://110.imagebam.com/download/-kdNbIi7uPIv0qLdzbkiIA/32797/327961796/displays.jpg
 
 ===Отображаемые параметры===
 Напряжение и ток  с [http://store.3drobotics.com/products/apm-power-module-with-xt60-connectors модуля питания]
@@ -33,13 +33,13 @@ GPS: NO Fix, 2D Fix, 3D Fix
 Heading - положение носа аппарата. В режиме Disarmed показывает положение носа по компасу (север - вверху)
 В режиме Arming показывает положение относительно взлета (как в SIMPLE режимах)
 
-
-Планируется в ближайших версиях:
-
-
 "Здоровье" (health) сенсоров
 
 Расстояние до следующей WayPoint
+
+
+Планируется в ближайших версиях:
+
 
 Отображение сообщений PreArm checks
 
@@ -85,3 +85,18 @@ Heading - положение носа аппарата. В режиме Disarmed
 
 ===Скачать последние версии прошивок===
 https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin
+
+===История изменений===
+
+[https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin r10]
+Отображение расстояние до следуещей точки маршрута wp_dist
+Отображение здоровья сенсоров (если включены):
+3D gyro
+3D accelerometer
+3D magnetometer
+absolute pressure
+differential pressure - air speed
+GPS
+optical flow
+geofence
+AHRS subsystem health
