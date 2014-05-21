@@ -11,7 +11,7 @@
 
 Ardupilot -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky
 http://110.imagebam.com/download/hg0nXB05H14ymeS-nfpRwg/32716/327152898/mavlink-frsky.jpg
-http://110.imagebam.com/download/vNVQdCwoCPpNa_ut1CptaQ/32715/327149802/displays.jpg
+http://111.imagebam.com/download/AVee9fsN-tlR2-AjRBWrrQ/32785/327846313/displays.jpg
 
 ===Отображаемые параметры===
 Напряжение и ток  с [http://store.3drobotics.com/products/apm-power-module-with-xt60-connectors модуля питания]
