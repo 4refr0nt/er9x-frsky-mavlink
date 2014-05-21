@@ -1,6 +1,8 @@
 /*
 	@author 	Nils Högberg
 	@contact 	nils.hogberg@gmail.com
+ 	@coauthor(s):
+	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -108,7 +110,7 @@ void setup() {
 	digitalWrite(HEARTBEATLED, HIGH);
 	hbState = HIGH;
 
-	FlexiTimer2::set(200, 1.0/1000, sendFrSkyData); // call every 200 1ms "ticks"
+	FlexiTimer2::set(250, 1.0/1000, sendFrSkyData); // call every 250 1ms "ticks"
 	FlexiTimer2::start();
 
 #ifdef DEBUG
@@ -213,19 +215,19 @@ void sendFrSkyData()
 {
 	counter++;
 	
-	if (counter >= 25)			 // Send 5000 ms frame
+	if (counter >= 20)			 // Send 5000 ms frame
 	{
 		frSky->sendFrSky05Hz(frSkySerial, dataProvider);
 		counter = 0;
 	}
-	else if ((counter % 5) == 0) // Send 1000 ms frame
+	else if ((counter % 4) == 0) // Send 1000 ms frame
 	{
 		frSky->sendFrSky1Hz(frSkySerial, dataProvider);
 #ifdef DEBUG
 		frSky->printValues(debugSerial, dataProvider);
 #endif
 	}
-	else						 // Send 200 ms frame
+	else						 // Send 250 ms frame
 	{
 		frSky->sendFrSky5Hz(frSkySerial, dataProvider);
 	}	

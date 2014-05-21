@@ -1,6 +1,8 @@
 /*
 	@author 	Nils Högberg
 	@contact 	nils.hogberg@gmail.com
+ 	@coauthor(s):
+	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -45,7 +47,10 @@ typedef unsigned char byte;
 #define YEAR           0x16
 #define TIME           0x17
 #define SECOND         0x18
-#define BASEMODE	   0x1D
+#define BASEMODE       0x1D
+#define WP_DIST        0x1E
+#define HEALTH         0x1F
+#define STATUS_MSG     0x20
 #define ALTIDEC        0x21
 #define EASTWEST       0x22
 #define NORTHSOUTH     0x23

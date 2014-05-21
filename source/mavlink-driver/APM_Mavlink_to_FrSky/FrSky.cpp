@@ -1,6 +1,8 @@
 /*
 	@author 	Nils Högberg
 	@contact 	nils.hogberg@gmail.com
+ 	@coauthor(s):
+	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -48,6 +50,12 @@ void FrSky::sendFrSky1Hz(SoftwareSerial* serialPort, IFrSkyDataProvider* dataPro
 	bufferLength += addBufferData(GPSALT,dataProvider);
 	bufferLength += addBufferData(FUEL, dataProvider);
 	bufferLength += addBufferData(BASEMODE, dataProvider);
+	bufferLength += addBufferData(WP_DIST, dataProvider);
+	bufferLength += addBufferData(HEALTH, dataProvider);
+	bufferLength += addBufferData(STATUS_MSG, dataProvider);
+	bufferLength += addBufferData(ACCX,dataProvider);
+	bufferLength += addBufferData(ACCY, dataProvider);
+	bufferLength += addBufferData(ACCZ, dataProvider);
 	frskyBuffer[bufferLength++] = tail_value;
 	bufferLength = writeBuffer(bufferLength, serialPort);
 }
@@ -57,9 +65,6 @@ void FrSky::sendFrSky5Hz(SoftwareSerial* serialPort, IFrSkyDataProvider* dataPro
 {
 	
 	// Three-axis Acceleration Values, Altitude (variometer-0.01m), Tempature1, Temprature2, Voltage , Current & Voltage (Ampere Sensor) , RPM, Course
-	bufferLength += addBufferData(ACCX,dataProvider);
-	bufferLength += addBufferData(ACCY, dataProvider);
-	bufferLength += addBufferData(ACCZ, dataProvider);
 	bufferLength += addBufferData(ALTITUDE, dataProvider);
 	bufferLength += addBufferData(TEMP1, dataProvider);
 	bufferLength += addBufferData(TEMP2, dataProvider);
@@ -373,6 +378,33 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 			return 8;
 			break;
 		}
+		case WP_DIST :
+		{
+			unsigned int wp_dist = dataProvider->getWPdist();
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = WP_DIST;
+			frskyBuffer[bufferLength + 2] = lsByte(wp_dist);
+			frskyBuffer[bufferLength + 3] = msByte(wp_dist);
+      
+			return 4;
+			break;
+		}
+		case HEALTH :
+		{
+			unsigned int sensors_health = dataProvider->getHealth();
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = HEALTH;
+			frskyBuffer[bufferLength + 2] = lsByte(sensors_health);
+			frskyBuffer[bufferLength + 3] = msByte(sensors_health);
+      
+			return 4;
+			break;
+		}
+		case STATUS_MSG : //TODO
+		{
+			return 0;
+			break;
+		}
 		default :
 			return 0;
   }
@@ -422,24 +454,28 @@ unsigned char FrSky::writeBuffer(const int length, SoftwareSerial* frSkySerial)
 
 void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProvider)
 {
-	serialPort->print("Voltage: ");
-	serialPort->print(dataProvider->getMainBatteryVoltage(), 2);
+	serialPort->print("Health: ");
+	serialPort->print(dataProvider->getHealth(), 10);
+	serialPort->print(" WP_dist: ");
+	serialPort->print(dataProvider->getWPdist(), 5);
+//	serialPort->print("Voltage: ");
+//	serialPort->print(dataProvider->getMainBatteryVoltage(), 2);
 	serialPort->print(" Current: ");
 	serialPort->print(dataProvider->getBatteryCurrent(), 2);
-	serialPort->print(" Fuel: ");
-	serialPort->print(dataProvider->getFuelLevel());
-	serialPort->print(" Latitude: ");
-	serialPort->print(dataProvider->getLatitude(), 6);
-	serialPort->print(" Longitude: ");
-	serialPort->print(dataProvider->getLongitud(), 6);
-	serialPort->print(" GPS Alt: ");
-	serialPort->print(dataProvider->getGpsAltitude(), 2);
+//	serialPort->print(" Fuel: ");
+//	serialPort->print(dataProvider->getFuelLevel());
+//	serialPort->print(" Latitude: ");
+//	serialPort->print(dataProvider->getLatitude(), 6);
+//	serialPort->print(" Longitude: ");
+//	serialPort->print(dataProvider->getLongitud(), 6);
+//	serialPort->print(" GPS Alt: ");
+//	serialPort->print(dataProvider->getGpsAltitude(), 2);
 	//serialPort->print(" GPS hdop: ");
 	//serialPort->print(dataProvider->getGpsHdop(), 2);
-	serialPort->print(" GPS status + sats: ");
-	serialPort->print(dataProvider->getTemp2());
-	serialPort->print(" GPS speed: ");
-	serialPort->print(dataProvider->getGpsGroundSpeed(), 2);
+//	serialPort->print(" GPS: ");
+//	serialPort->print(dataProvider->getTemp2());
+//	serialPort->print(" GPS speed: ");
+//	serialPort->print(dataProvider->getGpsGroundSpeed(), 2);
 	serialPort->print(" Home alt: ");
 	serialPort->print(dataProvider->getAltitude(), 2);
 	serialPort->print(" Mode: ");
@@ -448,11 +484,11 @@ void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProv
 	serialPort->print(dataProvider->getCourse(), 2);
 	serialPort->print(" RPM: ");
 	serialPort->print(dataProvider->getEngineSpeed());
-	serialPort->print(" AccX: ");
-	serialPort->print(dataProvider->getAccX(), 2);
-	serialPort->print(" AccY: ");
-	serialPort->print(dataProvider->getAccY(), 2);
-	serialPort->print(" AccZ: ");
-	serialPort->print(dataProvider->getAccZ(), 2);
+//	serialPort->print(" AccX: ");
+//	serialPort->print(dataProvider->getAccX(), 2);
+//	serialPort->print(" AccY: ");
+//	serialPort->print(dataProvider->getAccY(), 2);
+//	serialPort->print(" AccZ: ");
+//	serialPort->print(dataProvider->getAccZ(), 2);
 	serialPort->println("");
 }

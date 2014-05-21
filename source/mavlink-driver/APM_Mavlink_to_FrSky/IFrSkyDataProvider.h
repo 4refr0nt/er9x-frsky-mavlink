@@ -1,6 +1,8 @@
 /*
 	@author 	Nils Högberg
 	@contact 	nils.hogberg@gmail.com
+ 	@coauthor(s):
+	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -39,9 +41,11 @@ public:
 	virtual const float	getAccZ() = 0;
 	virtual const float	getBatteryCurrent() = 0;
 	virtual const float	getMainBatteryVoltage() = 0;
-	virtual const int   er9xEnable() = 0;
+	virtual const int   er9xEnable()  = 0;
 	virtual const int   er9xDisable() = 0;
-	virtual const int   getEr9x() = 0;
+	virtual const int   getEr9x()     = 0;
 	virtual const int   getBaseMode() = 0;
+	virtual const int   getWPdist()   = 0;
+	virtual const int   getHealth()   = 0;
 };
 

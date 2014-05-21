@@ -314,6 +314,12 @@ void voice_telem_item( int8_t index )
 			}
 		break ;
 		 
+		case FR_WP_DIST:
+  		if ( g_model.FrSkyImperial )
+  		{
+				value = m_to_ft(value) ;
+			}
+		break ;
 		case FR_CURRENT :
 			num_decimals = 1 ;
       unit = V_AMPS ;
@@ -6280,7 +6286,7 @@ void menuProc0(uint8_t event)
         }
 #ifdef FRSKY
         else if (view == e_telemetry) {
-            resetTelemetry();
+            resetTelemetry(0);
 #ifdef NMEA_EXTRA
 #if (defined(FRSKY) | defined(HUB))							//!!!!!!!!!!!!!!!!
 		AltMax = 0 ;								//!!!!!!!!!!!!!!!!
@@ -6294,7 +6300,7 @@ void menuProc0(uint8_t event)
         resetTimer1();
         resetTimer2();
 #ifdef FRSKY
-        resetTelemetry();
+        resetTelemetry(0);
 #ifdef NMEA_EXTRA
 #if (defined(FRSKY) | defined(HUB))							//!!!!!!!!!!!!!!!!
   	  AltOffset = AltMax = HomeSave = 0 ;					//!!!!!!!!!!!!!!!!
@@ -6670,26 +6676,25 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				lcd_putsAtt(  0 * FW, 0 * FH, PSTR("          "), 0 ); // clear inversed model name from screen
 
 				// line 0, left - V, volt
-				uint8_t batt_remote = getTelemetryValue(FR_VOLTS);
-				lcd_outdez (  4 * FW-1, 0, batt_remote / 10 );
-		        lcd_putc   (  4 * FW, 0, '.');
-				lcd_outdez (  5 * FW, 0, batt_remote - (batt_remote / 10) * 10 );
-		        lcd_putc   (  5 * FW+1, 0, 'v');
+				uint8_t batt_remote = FrskyHubData[FR_VOLTS];
+				lcd_outdez (  4 * FW - 1, 0, batt_remote / 10 );
+				lcd_outdez (  5 * FW   ,  0, batt_remote - (batt_remote / 10) * 10 );
+		        lcd_putc   ( 5 * FW + 1, 0, 'v');
 
 				// line 0, left - Current, Milliampers
-				lcd_outdez ( 9 * FW-1, 0, getTelemetryValue(FR_CURRENT) / 10 );
+				lcd_outdez ( 9 * FW-1, 0, FrskyHubData[FR_CURRENT] / 10 );
 		        lcd_putc   ( 9 * FW, 0, 'A');
 				// line 0, center - Battary Voltage
 					// already exist
 				// line 0, right - Battary remaining
-				uint8_t batt =  getTelemetryValue(FR_FUEL);
+				uint8_t batt =  FrskyHubData[FR_FUEL];
 				if ( batt < 20 ) attr = BLINK | INVERS;
 				lcd_outdezAtt ( 18*FW, 0*FH, batt, attr ) ;
 				lcd_putcAtt	  ( 18*FW+1, 0*FH, '%', attr );
 				lcd_hbar( 116, 1, 10, 5, batt ) ;
 				lcd_rect( 126, 2, 2, 3 ) ;
 				// line 1+2 - Flight mode
-				switch ( getTelemetryValue(FR_TEMP1) )
+				switch ( FrskyHubData[FR_TEMP1] )
 				{
 					case  0 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_0),  DBLSIZE );	break;
 					case  1 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_1),  DBLSIZE );	break;
@@ -6718,8 +6723,8 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				// line 4 - GPS fix converted from TEMP2
 				uint8_t gps_fix;
 				uint8_t gps_sat;
-				gps_fix = getTelemetryValue(FR_TEMP2) / 10;
-				gps_sat = getTelemetryValue(FR_TEMP2) - gps_fix * 10;
+				gps_fix = FrskyHubData[FR_TEMP2] / 10;
+				gps_sat = FrskyHubData[FR_TEMP2] - gps_fix * 10;
 				lcd_puts_P( 1 * FW, 4 * FH, PSTR(STR_MAV_GPS)); // "GPS:"
 				switch ( gps_fix )
 				{
@@ -6734,20 +6739,57 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				// line 5
 				lcd_puts_P(  1 * FW, 5*FH, PSTR(STR_MAV_GPS_SAT_COUNT) ); // "SatCount"
 				lcd_outdez( 11 * FW, 5*FH, gps_sat ) ;
+
+				lcd_puts_P( 12 * FW, 5*FH, PSTR(STR_MAV_WP_DIST) ); // "WPdist"
+				lcd_outdez( 21 * FW, 5*FH, FrskyHubData[FR_WP_DIST] ) ;
 				// line 6 
 				lcd_puts_P(  1 * FW, 6*FH, PSTR(STR_MAV_THR_OUT) ); // "THR out %"
-				lcd_outdez( 11 * FW, 6*FH, getTelemetryValue(FR_RPM) ) ;
+				lcd_outdez( 11 * FW, 6*FH, FrskyHubData[FR_RPM] ) ;
+   	                        uint16_t health = FrskyHubData[FR_HEALTH];
+                                if ( health & MAV_SYS_STATUS_SENSOR_3D_GYRO )
+                                {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_GYRO) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_SENSOR_3D_ACCEL ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_ACCEL) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_SENSOR_3D_MAG ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_MAG) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_PRESSURE) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_AIRSPEED) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_SENSOR_GPS ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_GPS) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_OPTICAL) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_GEOFENCE ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_GEOFENCE) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else if ( health & MAV_SYS_STATUS_AHRS ) {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_AHRS) );
+				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
+                                } else {
+				  lcd_puts_P( 12 * FW, 6*FH, PSTR(STR_MAV_HEALTH) ); // "Health Ok"
+     				  lcd_puts_P( 19 * FW + 2, 6*FH, PSTR(STR_MAV_OK) );
+                                }
+			        if ( health > 0 ) lcd_outdez( 18 * FW, 4*FH, health ) ;
 				// line 7 - footer
                 lcd_putsn_P( 0, 7*FH, Str_RXeq, 2 );
 								lcd_hbar( 14, 57, 49, 6, FrskyHubData[FR_RXRSI_COPY] ) ;
                 lcd_putsn_P( 116, 7*FH, Str_TXeq, 2 );
 								lcd_hbar( 65, 57, 49, 6, FrskyHubData[FR_TXRSI_COPY] ) ;
 				// THROTTLE bar, %
-				lcd_vbar( 0, 1 * FH, 4, 6 * FH - 1, getTelemetryValue(FR_RPM) ) ;
+				lcd_vbar( 0, 1 * FH, 4, 6 * FH - 1, FrskyHubData[FR_RPM] ) ;
 #if defined(CPUM128) || defined(CPUM2561)
-				uint8_t x0 = 98;
-				uint8_t y0 = 40;
-				uint8_t r  = 15;
+				uint8_t x0 = 119;
+				uint8_t y0 = 30;
+				uint8_t r  = 8;
 				uint8_t x;
 				uint8_t y;
 
@@ -6763,7 +6805,7 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 //				lcd_outdez( 15 * FW, 3 * FH, hdg ) ;
 //				if ( hdg > 360 ) hdg -= 360;
 //				if ( hdg < 0 ) hdg = 360 + hdg;
-				for (int8_t i = -3; i <= r-1; i++)
+				for (int8_t i = -3; i < r; i++)
 					{
 						x = x0 + i * cos ( hdg * PI / 180.0 ); // TODO: sin & cos -> tables for smaller binary
 						y = y0 + i * sin ( hdg * PI / 180.0 );
