@@ -89,14 +89,25 @@ https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin
 ===История изменений===
 
 [https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin r10]
+
 Отображение расстояние до следуещей точки маршрута wp_dist
+
 Отображение здоровья сенсоров (если включены):
+
 3D gyro
+
 3D accelerometer
+
 3D magnetometer
+
 absolute pressure
+
 differential pressure - air speed
+
 GPS
+
 optical flow
+
 geofence
+
 AHRS subsystem health
