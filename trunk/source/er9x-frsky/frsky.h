@@ -66,22 +66,22 @@
 #define FR_A4					42
 /* Extra data for Mavlink via FrSky */
 #define FR_BASEMODE			43
-#define FR_RESERVED1		44
-#define FR_RESERVED2		45
-#define FR_RESERVED3		46
+#define FR_WP_DIST		44
+#define FR_HEALTH		45
+#define FR_MSG			46
 /* Extra data for Mavlink via FrSky */
 #define FR_TRASH			47	// Used for invalid id
 
 #define FR_SPORT_ALT	0xFF
 
 /* Extra data for Mavlink via FrSky - MAV_MODE_FLAG */
-#define MAV_MODE_FLAG_CUSTOM_MODE_ENABLED	1 	/* 0b00000001 Reserved for future use. | */
-#define MAV_MODE_FLAG_TEST_ENABLED			2	/* 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations. | */
-#define MAV_MODE_FLAG_AUTO_ENABLED			4	/* 0b00000100 autonomous mode enabled, system finds its own goal positions. Guided flag can be set or not, depends on the actual implementation. | */
-#define MAV_MODE_FLAG_GUIDED_ENABLED		8	/* 0b00001000 guided mode enabled, system flies MISSIONs / mission items. | */
-#define MAV_MODE_FLAG_STABILIZE_ENABLED		16	/* 0b00010000 system stabilizes electronically its attitude (and optionally position). It needs however further control inputs to move around. | */
-#define MAV_MODE_FLAG_HIL_ENABLED			32	/* 0b00100000 hardware in the loop simulation. All motors / actuators are blocked, but internal software is full operational. | */
-#define MAV_MODE_FLAG_MANUAL_INPUT_ENABLED	64 	/* 0b01000000 remote control input is enabled. | */
+//#define MAV_MODE_FLAG_CUSTOM_MODE_ENABLED	1 	/* 0b00000001 Reserved for future use. | */
+//#define MAV_MODE_FLAG_TEST_ENABLED			2	/* 0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations. | */
+//#define MAV_MODE_FLAG_AUTO_ENABLED			4	/* 0b00000100 autonomous mode enabled, system finds its own goal positions. Guided flag can be set or not, depends on the actual implementation. | */
+//#define MAV_MODE_FLAG_GUIDED_ENABLED		8	/* 0b00001000 guided mode enabled, system flies MISSIONs / mission items. | */
+//#define MAV_MODE_FLAG_STABILIZE_ENABLED		16	/* 0b00010000 system stabilizes electronically its attitude (and optionally position). It needs however further control inputs to move around. | */
+//#define MAV_MODE_FLAG_HIL_ENABLED			32	/* 0b00100000 hardware in the loop simulation. All motors / actuators are blocked, but internal software is full operational. | */
+//#define MAV_MODE_FLAG_MANUAL_INPUT_ENABLED	64 	/* 0b01000000 remote control input is enabled. | */
 #define MAV_MODE_FLAG_SAFETY_ARMED			128	/* 0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly. | */
 /* Extra data for Mavlink via FrSky */
 
@@ -265,7 +265,25 @@ DataID Meaning       Unit   Range   Note
 // 0720   FR_ACCZ
 // 0830		FR_GPS_SPEED
 
-
+#define MAV_SYS_STATUS_SENSOR_3D_GYRO			 1  /* 0x01 3D gyro | */
+#define MAV_SYS_STATUS_SENSOR_3D_ACCEL			 2  /* 0x02 3D accelerometer | */
+#define MAV_SYS_STATUS_SENSOR_3D_MAG			 4  /* 0x04 3D magnetometer | */
+#define MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE		 8  /* 0x08 absolute pressure | */
+#define MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE     16  /* 0x10 differential pressure | */
+#define MAV_SYS_STATUS_SENSOR_GPS			32  /* 0x20 GPS | */
+#define MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW              64  /* 0x40 optical flow | */
+#define MAV_SYS_STATUS_GEOFENCE                    1048576  /* 0x100000 geofence | */
+#define MAV_SYS_STATUS_AHRS                        2097152  /* 0x200000 AHRS subsystem health | */
+#define MAV_SYS_ERR          "Err"
+#define MAV_SYS_ERR_GYRO     "GYRO "
+#define MAV_SYS_ERR_ACCEL    "ACCEL"
+#define MAV_SYS_ERR_MAG      " MAG "
+#define MAV_SYS_ERR_PRESSURE "PRESS"
+#define MAV_SYS_ERR_AIRSPEED "AIRSP"
+#define MAV_SYS_ERR_GPS      " GPS "
+#define MAV_SYS_ERR_OPTICAL  "OPTIC"
+#define MAV_SYS_ERR_GEOFENCE "FENCE"
+#define MAV_SYS_ERR_AHRS     "AHRS "
 
 #ifdef N2F
 #define FRSKY_TIMEOUT10ms 			200
@@ -350,7 +368,7 @@ void FRSKY_setModelAlarms(void) ;
 //enum AlarmLevel FRSKY_alarmRaised(uint8_t idx, uint8_t alarm=2) ;
 //enum AlarmLevel FRSKY_alarmRaised(uint8_t idx) ;
 //void FRSKY_alarmPlay(uint8_t idx, uint8_t alarm) ;
-void resetTelemetry();
+void resetTelemetry( uint8_t first );
 
 #if defined(CPUM128) || defined(CPUM2561)
 void FRSKY_disable( void ) ;

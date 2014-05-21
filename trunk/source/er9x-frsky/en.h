@@ -436,4 +436,7 @@
 #define STR_MAV_GPS_NO_FIX	 "No Fix"
 #define STR_MAV_GPS_SAT_COUNT "SatCount"
 #define STR_MAV_THR_OUT	     "THRout%"
+#define STR_MAV_WP_DIST "WPdist"
+#define STR_MAV_HEALTH  "Health"
+#define STR_MAV_OK  "Ok"
 /* Extra data for er9x FrSky+MavLink firmware End  */

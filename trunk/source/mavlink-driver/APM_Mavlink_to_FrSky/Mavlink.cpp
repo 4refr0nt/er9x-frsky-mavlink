@@ -1,6 +1,8 @@
 /*
 	@author 	Nils Högberg
 	@contact 	nils.hogberg@gmail.com
+ 	@coauthor(s):
+	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
 	Original code from https://code.google.com/p/arducam-osd/wiki/arducam_osd
 
@@ -60,11 +62,10 @@ Mavlink::Mavlink(BetterStream* port)
 	accX = 0;
 	accY = 0;
 	accZ = 0;
-	last_message_severity = 0;
-	cpu_voltage = 0;
-	cpu_load = 0;
-	sensors_health = 0;
 	apmBaseMode = 0;
+        wp_dist = 0;
+	sensors_health = 0;
+	last_message_severity = 0;
 }
 
 Mavlink::~Mavlink(void)
@@ -184,14 +185,15 @@ float Mavlink::gpsDdToDmsFormat(float ddm)
 
 void Mavlink::makeRateRequest()
 {
-	const int  maxStreams = 6;
+	const int  maxStreams = 7;
     const unsigned short MAVStreams[maxStreams] = {MAV_DATA_STREAM_RAW_SENSORS,
         MAV_DATA_STREAM_EXTENDED_STATUS,
         MAV_DATA_STREAM_RC_CHANNELS,
         MAV_DATA_STREAM_POSITION,
         MAV_DATA_STREAM_EXTRA1, 
-        MAV_DATA_STREAM_EXTRA2};
-    const unsigned int MAVRates[maxStreams] = {0x02, 0x02, 0x05, 0x02, 0x05, 0x02};
+        MAV_DATA_STREAM_EXTRA2,
+        MAV_DATA_STREAM_EXTRA3};
+    const unsigned int MAVRates[maxStreams] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x05, 0x02};
     for (int i=0; i < maxStreams; i++) {
         mavlink_msg_request_data_stream_send(MAVLINK_COMM_0,
             apm_mav_system, apm_mav_component,
@@ -203,6 +205,8 @@ bool Mavlink::parseMessage(char c)
 {
 	mavlink_message_t msg; 
     mavlink_status_t status;
+    unsigned long sensors_enabled;
+    unsigned long health;
 
 	// allow CLI to be started by hitting enter 3 times, if no heartbeat packets have been received
 	if (mavlink_active == 0 && millis() < 20000 && millis() > 5000)
@@ -248,8 +252,29 @@ bool Mavlink::parseMessage(char c)
                 batteryVoltage = (mavlink_msg_sys_status_get_voltage_battery(&msg) / 1000.0f); //Battery voltage, in millivolts (1 = 1 millivolt)
                 current = mavlink_msg_sys_status_get_current_battery(&msg); //Battery current, in 10*milliamperes (1 = 10 milliampere)         
                 batteryRemaining = mavlink_msg_sys_status_get_battery_remaining(&msg); //Remaining battery energy: (0%: 0, 100%: 100)
-				sensors_health = mavlink_msg_sys_status_get_onboard_control_sensors_health(&msg); // Bitmask showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
-				cpu_load = mavlink_msg_sys_status_get_load(&msg); // Maximum usage in percent of the mainloop time, (0%: 0, 100%: 1000) should be always below 1000
+                sensors_enabled  = mavlink_msg_sys_status_get_onboard_control_sensors_enabled(&msg);
+                health           = mavlink_msg_sys_status_get_onboard_control_sensors_health(&msg); // Bitmask showing which onboard controllers and sensors are operational or have an error:  Value of 0: not enabled. Value of 1: enabled. Indices defined by ENUM MAV_SYS_STATUS_SENSOR
+				//cpu_load = mavlink_msg_sys_status_get_load(&msg); // Maximum usage in percent of the mainloop time, (0%: 0, 100%: 1000) should be always below 1000
+                sensors_health = 0; // Default - All sensors status: ok
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_3D_GYRO )
+                if (!( health & MAV_SYS_STATUS_SENSOR_3D_GYRO ))                    sensors_health |= MAV_SYS_STATUS_SENSOR_3D_GYRO;
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_3D_ACCEL )
+                if (!( health & MAV_SYS_STATUS_SENSOR_3D_ACCEL ))                   sensors_health |= MAV_SYS_STATUS_SENSOR_3D_ACCEL;
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_3D_MAG )
+                if (!( health & MAV_SYS_STATUS_SENSOR_3D_MAG ))                     sensors_health |= MAV_SYS_STATUS_SENSOR_3D_MAG;
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE )
+                if (!( health & MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE ))          sensors_health |= MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE;
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE )
+                if (!( health & MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE ))      sensors_health |= MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE;
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_GPS )
+                if (!( health & MAV_SYS_STATUS_SENSOR_GPS ))                        sensors_health |= MAV_SYS_STATUS_SENSOR_GPS;
+                if ( sensors_enabled & MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW )
+                if (!( health & MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW ))               sensors_health |= MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW;
+                if ( sensors_enabled & MAV_SYS_STATUS_GEOFENCE )
+                if (!( health & MAV_SYS_STATUS_GEOFENCE ))                          sensors_health |= MAV_SYS_STATUS_GEOFENCE;
+                if ( sensors_enabled & MAV_SYS_STATUS_AHRS )
+                if (!( health & MAV_SYS_STATUS_AHRS ))                              sensors_health |= MAV_SYS_STATUS_AHRS;
+
 				return true;
 				break;
             }
@@ -342,8 +367,9 @@ void Mavlink::reset()
 	last_message_severity = 0;
 	cpu_voltage = 0;
 	cpu_load = 0;
+//	apmBaseMode = 0; // if system armed, stay armed if link down
+        wp_dist = 0;
 	sensors_health = 0;
-	apmBaseMode = 0;
 }
 
 const int Mavlink::er9xEnable()
@@ -365,4 +391,12 @@ const int Mavlink::getEr9x()
 const int Mavlink::getBaseMode()
 {
 	return apmBaseMode;
+}
+const int Mavlink::getWPdist()
+{
+	return wp_dist;
+}
+const int Mavlink::getHealth()
+{
+	return sensors_health;
 }

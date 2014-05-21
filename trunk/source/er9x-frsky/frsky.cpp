@@ -78,9 +78,9 @@ const prog_uint8_t APM Fr_indices[] =
 	FR_COURSEd,
 /* Extra data for Mavlink via FrSky */
 	FR_BASEMODE,
-	FR_RESERVED1,
-	FR_RESERVED2,
-	FR_RESERVED3,
+	FR_WP_DIST,
+	FR_HEALTH,
+	FR_MSG,
 /* Extra data for Mavlink via FrSky */
 	FR_ALT_BAROd,
 	FR_LONG_E_W,
@@ -1162,7 +1162,7 @@ void FRSKY_Init( uint8_t brate)
 		return ;
 #endif
   memset(frskyAlarms, 0, sizeof(frskyAlarms));
-  resetTelemetry();
+  resetTelemetry(1);
 
   DDRE &= ~(1 << DDE0);    // set RXD0 pin as input
   PORTE &= ~(1 << PORTE0); // disable pullup on RXD0 pin
@@ -1285,7 +1285,7 @@ void FrskyData::set(uint8_t value, uint8_t copy)
 #endif
 }
 
-void resetTelemetry()
+void resetTelemetry( uint8_t first )
 {
 //	FrskyData *ptr_data = &frskyTelemetry[0] ;
 //	FORCE_INDIRECT(ptr_data) ;
@@ -1305,6 +1305,12 @@ void resetTelemetry()
 	Frsky_Amp_hour_prescale = 0 ;
 	FrskyHubData[FR_AMP_MAH] = 0 ;
 	FrskyHubData[FR_TEMP1] = 98 ;
+	FrskyHubData[FR_WP_DIST] = 0 ;
+	FrskyHubData[FR_MSG] = 0 ;
+	if ( first ) {
+		FrskyHubData[FR_BASEMODE] = 0 ; // clearimg Arming flag only for first time
+		FrskyHubData[FR_HEALTH] = 32 ;  // GPS ERR - cleared when telemetry packet received
+	}
   memset( &FrskyHubMaxMin, 0, sizeof(FrskyHubMaxMin));
 }
 

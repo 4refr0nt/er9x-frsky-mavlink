@@ -535,7 +535,7 @@ WINSHELL = cmd
 
 # th9x/er9x-specific
 XBM2LBM = ruby ../util/xbm2lbm.rb
-AREV = $(shell sh -c "cat .svn/entries | sed -n '4p'")
+AREV = $(shell sh -c "cat ../../.svn/entries")
 REV = $(shell echo $$(( $(AREV) + 1 )))
 
 
@@ -610,8 +610,8 @@ stamp:
 	@echo "//Automatically generated file - do not edit" > stamp-er9x.h
 	@echo "#define DATE_STR \"`date +%d.%m.%Y`\"" >> stamp-er9x.h
 	@echo "#define TIME_STR \"`date +%H:%M:%S`\"" >> stamp-er9x.h
-	@echo "#define SUB_VERS $(VER)-$(USER)" >> stamp-er9x.h
-	@echo "#define SVN_VERS \"er9x-r$(REV)\"" >> stamp-er9x.h
+	@echo "#define SUB_VERS $(VER)" >> stamp-er9x.h
+	@echo "#define SVN_VERS \"er9x-mav-r$(REV)\"" >> stamp-er9x.h
 	@echo "#define MOD_VERS \"$(EXT_MOD) $(HT_MOD) $(BEEPER_MOD) $(CPU_MOD) $(SC_MOD) \"" >> stamp-er9x.h
 #	@cat stamp-er9x.h
 
