@@ -950,6 +950,28 @@ void MState2::check_simple(uint8_t event, uint8_t curr, const MenuFuncP *menuTab
     check(event, curr, menuTab, menuTabSize, 0, 0, maxrow);
 }
 
+#if !defined(CPUM128) && !defined(CPUM2561)
+const int8_t COS[] = { 100,97,87,71,50,26,0,-26,-50,-71,-87,-97,-100,-97,-87,-71,-50,-26,0,26,50,71,87,97,100 };
+const int8_t SIN[] = { 0,26,50,71,87,97,100,97,87,71,50,26,0,-26,-50,-71,-87,-97,-100,-97,-87,-71,-50,-26,0   };
+
+uint16_t normalize( int16_t alpha )
+{
+   if ( alpha > 360 ) alpha -= 360;
+   if ( alpha <   0 ) alpha = 360 + alpha;
+   alpha /= 15;
+   return alpha ;
+}
+int8_t rcos100( int16_t alpha )
+{
+   alpha = normalize( alpha );
+   return COS[alpha];
+}
+int8_t rsin100( int16_t alpha )
+{
+   alpha = normalize( alpha );
+   return SIN[alpha];
+}
+#endif
 //void MState2::check_submenu_simple(uint8_t event, uint8_t maxrow)
 //{
 //    check_simple(event, 0, 0, 0, maxrow);
@@ -6786,7 +6808,6 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 								lcd_hbar( 65, 57, 49, 6, FrskyHubData[FR_TXRSI_COPY] ) ;
 				// THROTTLE bar, %
 				lcd_vbar( 0, 1 * FH, 4, 6 * FH - 1, FrskyHubData[FR_RPM] ) ;
-#if defined(CPUM128) || defined(CPUM2561)
 				uint8_t x0 = 119;
 				uint8_t y0 = 30;
 				uint8_t r  = 8;
@@ -6803,16 +6824,18 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				}
 				hdg = hdg - hdg_home + 270 ; // use SIMPLE mode 
 //				lcd_outdez( 15 * FW, 3 * FH, hdg ) ;
-//				if ( hdg > 360 ) hdg -= 360;
-//				if ( hdg < 0 ) hdg = 360 + hdg;
 				for (int8_t i = -3; i < r; i++)
 					{
-						x = x0 + i * cos ( hdg * PI / 180.0 ); // TODO: sin & cos -> tables for smaller binary
+#if defined(CPUM128) || defined(CPUM2561)
+						x = x0 + i * cos ( hdg * PI / 180.0 );
 						y = y0 + i * sin ( hdg * PI / 180.0 );
+#else
+						x = x0 + ( i * rcos100 ( hdg ) ) / 100; 
+						y = y0 + ( i * rsin100 ( hdg ) ) / 100;
+#endif
 						lcd_plot(x, y);
 					}
 							
-#endif
             }
 /* Extra data for Mavlink via FrSky */
             else		// Custom screen
