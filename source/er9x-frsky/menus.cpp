@@ -67,8 +67,6 @@ const prog_char APM UnitsString[] = "\005Feet VoltsDeg_CDeg_FmAh  Amps MetreWatt
 
 #ifdef FRSKY
 
-static int16_t hdg_home ;
-
 // TSSI set to zero on no telemetry data
 const prog_char APM Str_telemItems[] = STR_TELEM_ITEMS ; 
 const prog_int8_t APM TelemIndex[] = {FR_A1_COPY, FR_A2_COPY,
@@ -6697,134 +6695,171 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				uint8_t attr = 0;
 				lcd_putsAtt(  0 * FW, 0 * FH, PSTR("          "), 0 ); // clear inversed model name from screen
 
-				// line 0, left - V, volt
-				uint8_t batt_remote = FrskyHubData[FR_VOLTS];
-				lcd_outdez (  4 * FW - 1, 0, batt_remote / 10 );
-				lcd_outdez (  5 * FW   ,  0, batt_remote - (batt_remote / 10) * 10 );
-		        lcd_putc   ( 5 * FW + 1, 0, 'v');
-
-				// line 0, left - Current, Milliampers
-				lcd_outdez ( 9 * FW-1, 0, FrskyHubData[FR_CURRENT] / 10 );
-		        lcd_putc   ( 9 * FW, 0, 'A');
-				// line 0, center - Battary Voltage
-					// already exist
-				// line 0, right - Battary remaining
+				// line 0, left - Battary remaining
 				uint8_t batt =  FrskyHubData[FR_FUEL];
-				if ( batt < 20 ) attr = BLINK | INVERS;
-				lcd_outdezAtt ( 18*FW, 0*FH, batt, attr ) ;
-				lcd_putcAtt	  ( 18*FW+1, 0*FH, '%', attr );
-				lcd_hbar( 116, 1, 10, 5, batt ) ;
-				lcd_rect( 126, 2, 2, 3 ) ;
-				// line 1+2 - Flight mode
+				if ( batt < 20 ) { attr = BLINK; } else {attr = 0;}
+				lcd_hbar( 01, 1, 10, 5, batt ) ;
+				lcd_rect( 11, 2, 2, 3 ) ;
+				if (batt > 99) batt = 99;
+				lcd_outdezAtt ( 4*FW,   0*FH, batt, attr );
+				lcd_putcAtt	  ( 4*FW+1, 0*FH, '%',  attr );
+				// line 0, V, volt bat
+                attr = PREC1 ;
+                lcd_outdezAtt( 8 * FW+2, 0, FrskyHubData[FR_VOLTS], attr ) ;
+				// line 0, V, volt cpu
+                lcd_outdezAtt( 11 * FW-2, 0, FrskyHubData[FR_VCC], PREC1 ) ;
+		        //lcd_putc     ( 11 * FW+1, 0, 'v');
+				// line 1 - Flight mode
+                uint8_t blink = BLINK;
+                if (frskyUsrStreaming) blink = 0 ;
+
 				switch ( FrskyHubData[FR_TEMP1] )
 				{
-					case  0 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_0),  DBLSIZE );	break;
-					case  1 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_1),  DBLSIZE );	break;
-					case  2 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_2),  DBLSIZE );	break;
-					case  3 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_3),  DBLSIZE );	break;
-					case  4 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_4),  DBLSIZE );	break;
-					case  5 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_5),  DBLSIZE );	break;
-					case  6 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_6),  DBLSIZE );	break;
-					case  7 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_7),  DBLSIZE );	break;
-					case  9 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_9),  DBLSIZE );	break;
-					case 10 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_10), DBLSIZE );	break;
-					case 11 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_11), DBLSIZE );	break;
-					case 13 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_13), DBLSIZE );	break;
-					case 14 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_14), DBLSIZE );	break;
-					case 98 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_98), DBLSIZE );	break;
-					case 99 : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_99), DBLSIZE );	break;
-					default : lcd_putsAtt( 2*FW, 1*FH+1, PSTR(STR_MAV_FM_97), DBLSIZE );
+					case  0 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_0),  blink );	break;
+					case  1 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_1),  blink );	break;
+					case  2 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_2),  blink );	break;
+					case  3 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_3),  blink );	break;
+					case  4 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_4),  blink );	break;
+					case  5 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_5),  blink );	break;
+					case  6 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_6),  blink );	break;
+					case  7 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_7),  blink );	break;
+					case  8 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_8),  blink );	break;
+					case  9 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_9),  blink );	break;
+					case 10 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_10), blink );	break;
+					case 11 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_11), blink );	break;
+					case 12 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_12), blink );	break;
+					case 13 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_13), blink );	break;
+					case 14 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_14), blink );	break;
+					case 15 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_15), blink );	break;
+					case 16 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_16), blink );	break;
+					case 17 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_17), blink );	break;
+					case 18 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_18), blink );	break;
+					case 19 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_19), blink );	break;
+					case 98 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_98), BLINK );	break;
+					case 99 : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_FM_99), BLINK );	break;
+					default : lcd_putsAtt( 15*FW-1, 1*FH, PSTR(STR_MAV_NODATA), BLINK );
 				}
-				// line 3 - Armed/Disarmed
+				// line 1 - Armed/Disarmed
+				if (frskyUsrStreaming) {
 				if ( FrskyHubData[FR_BASEMODE] & MAV_MODE_FLAG_SAFETY_ARMED ) {
-					lcd_putsAtt(  1 * FW, 3 * FH, PSTR(STR_MAV_ARMED), INVERS) ;
+					lcd_putsAtt(  1 * FW, 1 * FH, PSTR(STR_MAV_ARMED), blink) ;
 				} else {
-					lcd_putsAtt(  1 * FW, 3 * FH, PSTR(STR_MAV_DISARMED), 0) ;
+					lcd_putsAtt(  0 * FW, 1 * FH, PSTR(STR_MAV_DISARMED), blink) ;
+				}
+				} else {
+					lcd_putsAtt(  0 * FW, 1 * FH, PSTR(STR_MAV_NODATA), BLINK) ; // NO DRV
 				}
 				// lcd_outdez( 15 * FW, 3 * FH, FrskyHubData[FR_BASEMODE] ) ;
-				// line 4 - GPS fix converted from TEMP2
+				// line 2 - GPS fix converted from TEMP2
 				uint8_t gps_fix;
 				uint8_t gps_sat;
-				gps_fix = FrskyHubData[FR_TEMP2] / 10;
-				gps_sat = FrskyHubData[FR_TEMP2] - gps_fix * 10;
-				lcd_puts_P( 1 * FW, 4 * FH, PSTR(STR_MAV_GPS)); // "GPS:"
+				gps_fix = FrskyHubData[FR_TEMP2] % 10;
+                gps_sat = FrskyHubData[FR_TEMP2] / 10;
 				switch ( gps_fix )
 				{
-					case 1: 	lcd_putsAtt( 5*FW, 4*FH, PSTR(STR_MAV_GPS_NO_FIX), BLINK); break;
-					case 2: 	lcd_puts_P ( 5*FW, 4*FH, PSTR(STR_MAV_GPS_2DFIX )); break;
-					case 3: 	lcd_puts_P ( 5*FW, 4*FH, PSTR(STR_MAV_GPS_3DFIX )); break;
-					case 4: 	lcd_puts_P ( 5*FW, 4*FH, PSTR(STR_MAV_GPS_3DFIX ));
-								gps_sat += 10;
-								break;
-					default :  	lcd_puts_P ( 5*FW, 4*FH+4, PSTR(STR_OFF		   )); break;
+					case 1: 	lcd_putsAtt( 0 * FW, 2*FH, PSTR(STR_MAV_GPS_NO_FIX), BLINK); break;
+					case 2: 	lcd_puts_P ( 0 * FW, 2*FH, PSTR(STR_MAV_GPS_2DFIX )); break;
+					case 3: 	lcd_puts_P ( 0 * FW, 2*FH, PSTR(STR_MAV_GPS_3DFIX )); break;
+					case 4: 	lcd_puts_P ( 0 * FW, 2*FH, PSTR(STR_MAV_GPS_DGPS )); break;
+					case 5: 	lcd_puts_P ( 0 * FW, 2*FH, PSTR(STR_MAV_GPS_RTK )); break;
+					default :  	lcd_putsAtt( 0 * FW, 2*FH, PSTR(STR_MAV_GPS_NO_GPS), INVERS); break;
 				}
-				// line 5
-				lcd_puts_P(  1 * FW, 5*FH, PSTR(STR_MAV_GPS_SAT_COUNT) ); // "SatCount"
-				lcd_outdez( 11 * FW, 5*FH, gps_sat ) ;
-
-				lcd_puts_P( 12 * FW, 5*FH, PSTR(STR_MAV_WP_DIST) ); // "WPdist"
-				lcd_outdez( 21 * FW, 5*FH, FrskyHubData[FR_WP_DIST] ) ;
-				// line 6 
-				lcd_puts_P(  1 * FW, 6*FH, PSTR(STR_MAV_THR_OUT) ); // "THR out %"
-				lcd_outdez( 11 * FW, 6*FH, FrskyHubData[FR_RPM] ) ;
-   	                        uint16_t health = FrskyHubData[FR_HEALTH];
-                                if ( health & MAV_SYS_STATUS_SENSOR_3D_GYRO )
-                                {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_GYRO) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_SENSOR_3D_ACCEL ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_ACCEL) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_SENSOR_3D_MAG ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_MAG) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_PRESSURE) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_AIRSPEED) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_SENSOR_GPS ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_GPS) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_OPTICAL) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_GEOFENCE ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_GEOFENCE) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else if ( health & MAV_SYS_STATUS_AHRS ) {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(MAV_SYS_ERR_AHRS) );
-				  lcd_puts_P( 18 * FW, 6*FH, PSTR(MAV_SYS_ERR) );
-                                } else {
-				  lcd_puts_P( 12 * FW, 6*FH, PSTR(STR_MAV_HEALTH) ); // "Health Ok"
-     				  lcd_puts_P( 19 * FW + 2, 6*FH, PSTR(STR_MAV_OK) );
-                                }
-			        if ( health > 0 ) lcd_outdez( 18 * FW, 4*FH, health ) ;
+				// line 3 left
+				lcd_puts_P( 0 * FW,   3*FH, PSTR(STR_MAV_GPS_SAT_COUNT) ); // sat
+				lcd_outdez( 7 * FW-2, 3*FH, gps_sat ) ;
+				// line 4 left
+				lcd_puts_P( 0 * FW,   4*FH, PSTR(STR_MAV_GPS_HDOP) ); // hdop
+				lcd_outdez( 7 * FW-2, 4*FH, FrskyHubData[FR_GPS_HDOP] ) ;
+				// line 5 left
+				//lcd_outdez( 7 * FW-2, 5*FH, frskyUsrStreaming ) ; // heartbeat
+				lcd_hbar( 0, 5*FH+1, 40, 4, frskyUsrStreaming ) ; // heartbeat
+				// line 2 right
+				lcd_puts_P( 15 * FW-1, 2*FH, PSTR(STR_MAV_ALT) ); // Alt
+                int16_t val;
+				val = getTelemetryValue(FR_ALT_BARO);
+				attr = 0;
+                if ( val < 1000 )
+			       {
+                       attr |= PREC1 ;
+                   }
+                else
+                   {
+                       val /= 10 ;
+                   }
+                lcd_outdezAtt( 21 * FW+1, 2*FH, val, attr ) ;
+				// line 3 right
+				lcd_puts_P( 15 * FW-1, 3*FH, PSTR(STR_MAV_GALT) ); // GAlt
+				lcd_outdez( 21 * FW+1, 3*FH, getTelemetryValue(FR_GPS_ALT) ) ;
+				// line 4 right
+				lcd_puts_P( 15 * FW-1, 4*FH, PSTR(STR_MAV_HOME) ); // home
+				lcd_outdez( 21 * FW+1, 4*FH, FrskyHubData[FR_HOME_DIST] ) ;
+				// line 5 right
+				lcd_puts_P( 15 * FW-1, 5*FH, PSTR(STR_MAV_WP_DIST) ); // "WP"
+				lcd_outdez( 18 * FW+1, 5*FH, FrskyHubData[FR_WP_NUM] ) ;
+				lcd_outdez( 21 * FW+1, 5*FH, FrskyHubData[FR_WP_DIST] ) ;
+				// line 6 right
+				lcd_puts_P( 15 * FW-1, 6*FH, PSTR(STR_MAV_THR_OUT) ); // "THR%"
+				lcd_outdez( 21 * FW+1, 6*FH, FrskyHubData[FR_RPM] ) ;
+#if defined(CPUM128) || defined(CPUM2561)
+                // line 6 left
+                uint16_t health = FrskyHubData[FR_HEALTH];
+				attr = BLINK;
+                if ( health & MAV_SYS_STATUS_SENSOR_3D_GYRO ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_GYRO), attr );
+                    } else if ( health & MAV_SYS_STATUS_SENSOR_3D_ACCEL ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_ACCEL), attr );
+                    } else if ( health & MAV_SYS_STATUS_SENSOR_3D_MAG ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_MAG), attr );
+                    } else if ( health & MAV_SYS_STATUS_SENSOR_ABSOLUTE_PRESSURE ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_PRESSURE), attr );
+                    } else if ( health & MAV_SYS_STATUS_SENSOR_DIFFERENTIAL_PRESSURE ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_AIRSPEED), attr );
+                    } else if ( health & MAV_SYS_STATUS_SENSOR_GPS ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_GPS), attr );
+                    } else if ( health & MAV_SYS_STATUS_SENSOR_OPTICAL_FLOW ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_OPTICAL), attr );
+                    } else if ( health & MAV_SYS_STATUS_GEOFENCE ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_GEOFENCE), attr );
+                    } else if ( health & MAV_SYS_STATUS_AHRS ) {
+                        lcd_putsAtt( 0 * FW, 6*FH, PSTR(MAV_SYS_ERR_AHRS), attr );
+                    } else {
+						//do nothing
+                        //lcd_putsAtt( 0 * FW, 5*FH, PSTR(STR_MAV_HEALTH), 0 ); // "HeartOk"
+                    }
+#endif
+//		        if ( health > 0 ) lcd_outdez( 18 * FW, 4*FH, health ) ;
 				// line 7 - footer
+				// rx
                 lcd_putsn_P( 0, 7*FH, Str_RXeq, 2 );
-								lcd_hbar( 14, 57, 49, 6, FrskyHubData[FR_RXRSI_COPY] ) ;
-                lcd_putsn_P( 116, 7*FH, Str_TXeq, 2 );
-								lcd_hbar( 65, 57, 49, 6, FrskyHubData[FR_TXRSI_COPY] ) ;
+//              lcd_hbar( 14, 57, 49, 6, FrskyHubData[FR_RXRSI_COPY] ) ;
+				uint8_t rx = FrskyHubData[FR_RXRSI_COPY];
+				if (rx > 99) rx = 99;
+                lcd_outdezAtt( 4*FW-2, 7*FH, rx, blink);
+                // tx
+                lcd_putsn_P( 4*FW, 7*FH, Str_TXeq, 2 );
+//              lcd_hbar( 65, 57, 49, 6, FrskyHubData[FR_TXRSI_COPY] ) ;
+				uint8_t tx = FrskyHubData[FR_TXRSI_COPY];
+				if (tx > 99) tx = 99;
+                lcd_outdezAtt( 8*FW-2, 7*FH, tx, blink);
+				// CPU
+				lcd_puts_P(  9 * FW, 7*FH, PSTR(STR_MAV_CPU) ); // "CPU"
+				lcd_outdez( 14 * FW, 7*FH, FrskyHubData[FR_CPU_LOAD] ) ;
+		        lcd_putc  ( 14 * FW+1, 7*FH, '%');
+				// Current, Milliampers
+                lcd_outdezAtt( 20 * FW+1, 7*FH, FrskyHubData[FR_CURRENT], PREC1 ) ;
+				//lcd_outdez ( 20 * FW+1, 7*FH,  FrskyHubData[FR_CURRENT])/10;
+		        lcd_putc   ( 20 * FW+2, 7*FH, 'A');
 				// THROTTLE bar, %
-				lcd_vbar( 0, 1 * FH, 4, 6 * FH - 1, FrskyHubData[FR_RPM] ) ;
-				uint8_t x0 = 119;
-				uint8_t y0 = 30;
-				uint8_t r  = 8;
+				//lcd_vbar( 0, 1 * FH, 4, 6 * FH - 1, FrskyHubData[FR_RPM] ) ;
+				uint8_t x0 = 64;
+				uint8_t y0 = 31;
+				uint8_t r  = 23;
 				uint8_t x;
 				uint8_t y;
-
 				DO_SQUARE( x0, y0, r * 2 + 1 );
 				int16_t hdg = FrskyHubData[FR_COURSE];
-				if  ( FrskyHubData[FR_BASEMODE] & MAV_MODE_FLAG_SAFETY_ARMED ) // armed
-				{   // we save head position before arming
-					if ( hdg_home == 0 ) hdg_home = hdg;
-				} else {
-					hdg_home = 0 ;
-				}
-				hdg = hdg - hdg_home + 270 ; // use SIMPLE mode 
 //				lcd_outdez( 15 * FW, 3 * FH, hdg ) ;
-				for (int8_t i = -3; i < r; i++)
+				for (int8_t i = -3; i < r-1; i++)
 					{
 #if defined(CPUM128) || defined(CPUM2561)
 						x = x0 + i * cos ( hdg * PI / 180.0 );
@@ -6835,7 +6870,126 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 #endif
 						lcd_plot(x, y);
 					}
-							
+				// dir to wp
+				hdg = FrskyHubData[FR_WP_BEARING];
+				for (int8_t i = r-4; i < r+1; i++)
+					{
+#if defined(CPUM128) || defined(CPUM2561)
+						x = x0 + i * cos ( hdg * PI / 180.0 );
+						y = y0 + i * sin ( hdg * PI / 180.0 );
+#else
+						x = x0 + ( i * rcos100 ( hdg ) ) / 100; 
+						y = y0 + ( i * rsin100 ( hdg ) ) / 100;
+#endif
+						lcd_plot(x, y);
+					}
+				// dir to home
+				hdg = FrskyHubData[FR_HOME_DIR];
+				uint8_t x1,x2;
+				uint8_t y1,y2;
+				for (int8_t i = r-4; i < r+1; i++)
+					{
+#if defined(CPUM128) || defined(CPUM2561)
+						x  = x0 + i * cos ( hdg * PI / 180.0 );
+						x1 = x0 + i * cos ( (hdg-3) * PI / 180.0 );
+						x2 = x0 + i * cos ( (hdg+3) * PI / 180.0 );
+						y  = y0 + i * sin ( hdg * PI / 180.0 );
+						y1 = y0 + i * sin ( (hdg-3) * PI / 180.0 );
+						y2 = y0 + i * sin ( (hdg+3) * PI / 180.0 );
+#else
+						x  = x0 + ( i * rcos100 ( hdg ) ) / 100; 
+						x1 = x0 + ( i * rcos100 ( hdg-3 ) ) / 100; 
+						x2 = x0 + ( i * rcos100 ( hdg+3 ) ) / 100; 
+						y  = y0 + ( i * rsin100 ( hdg ) ) / 100;
+						y1 = y0 + ( i * rsin100 ( hdg-3 ) ) / 100;
+						y2 = y0 + ( i * rsin100 ( hdg+3 ) ) / 100;
+#endif
+						lcd_plot(x, y);
+						lcd_plot(x1, y1);
+						lcd_plot(x2, y2);
+					}
+#if defined(CPUM128) || defined(CPUM2561)
+			attr = BLINK;
+			x = FrskyHubData[FR_MSG];
+			// lcd_outdez( 7 * FW-2, 6*FH, x ) ; // debug only
+            switch (x)
+            {
+              case 1 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_01), attr );
+					 break;
+              case 2 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_02), attr );
+					 break;
+              case 3 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_03), attr );
+					 break;
+              case 4 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_04), attr );
+					 break;
+              case 5 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_05), attr );
+					 break;
+              case 6 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_06), attr );
+					 break;
+              case 7 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_07), attr );
+					 break;
+              case 8 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_08), attr );
+					 break;
+              case 9 :
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_09), attr );
+					 break;
+              case 10:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_10), attr );
+					 break;
+              case 11:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_11), attr );
+					 break;
+              case 12:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_12), attr );
+					 break;
+              case 13:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_13), attr );
+					 break;
+              case 14:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_14), attr );
+					 break;
+              case 15:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_15), attr );
+					 break;
+              case 16:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_16), attr );
+					 break;
+              case 17:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_17), attr );
+					 break;
+              case 18:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_18), attr );
+					 break;
+              case 19:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_19), attr );
+					 break;
+              case 20:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_20), attr );
+					 break;
+              case 21:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_21), attr );
+					 break;
+              case 22:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_22), attr );
+					 break;
+              case 23:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_23), attr );
+					 break;
+              case 24:
+                     lcd_putsAtt( 0 * FW, 3*FH, PSTR(STR_MAV_ERR_24), attr );
+					 break;
+		      //default :
+			       // if 0 or other value - do nothing
+              }
+#endif
             }
 /* Extra data for Mavlink via FrSky */
             else		// Custom screen

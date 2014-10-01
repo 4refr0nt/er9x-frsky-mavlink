@@ -1,5 +1,5 @@
 /*
-	@author 	Nils Högberg
+	@author 	Nils HÑ†gberg
 	@contact 	nils.hogberg@gmail.com
  	@coauthor(s):
 	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
@@ -41,11 +41,18 @@ public:
 	virtual const float	getAccZ() = 0;
 	virtual const float	getBatteryCurrent() = 0;
 	virtual const float	getMainBatteryVoltage() = 0;
-	virtual const int   er9xEnable()  = 0;
-	virtual const int   er9xDisable() = 0;
-	virtual const int   getEr9x()     = 0;
-	virtual const int   getBaseMode() = 0;
-	virtual const int   getWPdist()   = 0;
-	virtual const int   getHealth()   = 0;
+	virtual const int   getBaseMode()   = 0;
+	virtual const int   getWP_dist()    = 0;
+	virtual const int   getWP_num()     = 0;
+	virtual const int   getWP_bearing() = 0;
+	virtual const int   getHealth()     = 0;
+	virtual const int   getStatus_msg() = 0;
+	virtual const int   getHome_dir()   = 0;
+	virtual const int   getHome_dist()  = 0;
+	virtual const int   getCpu_load()   = 0;
+	virtual const int   getVcc()        = 0;
+	virtual const int   getGpsHdop()    = 0;
+	virtual const bool  isArmed()       = 0;
+	virtual const int   getNCell()      = 0;
+	virtual const int   getCell()       = 0;
 };
-

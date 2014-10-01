@@ -87,3 +87,4 @@ void SimpleFIFO<T,rawSize>::flush() {
 	nextIn = nextOut = numberOfElements = 0;
 }
 #endif
+

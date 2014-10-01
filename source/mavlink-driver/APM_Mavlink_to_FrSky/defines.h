@@ -1,5 +1,5 @@
 /*
-	@author 	Nils Högberg
+	@author 	Nils HÑ†gberg
 	@contact 	nils.hogberg@gmail.com
  	@coauthor(s):
 	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
@@ -25,7 +25,37 @@
 typedef unsigned char byte;
 #endif
 
+/* Mavlink data
+   Changed
+0x02 temp1      getTemp1      apmMode   (Flight mode)
+0x04 FUEL       getFuelLevel  batteryRemaining
+0x05 temp2      getTemp2      gpsStatus * 10 + numberOfSatelites
+   New
+0xA  HOME_DIR   getHome_dir   home_direction   
+0xB  HOME_DIST  getHome_dist  home_distance    
+0xC  CPU_LOAD   getCpu_load   cpu_load    
+0xD  GPS_HDOP   getGpsHdop    gpsHdop    
+0xE  WP_NUM         
+0xF  WP_BEARING     
+0x1D BASEMODE   getBaseMode   apmBaseMode
+0x1E WP_DIST    getWP_dist    wp_dist
+0x1F HEALTH     getHealth     sensors_health
+0x20 STATUS_MSG getStatus_msg status_msg
 
+enum gcs_severity {
+    SEVERITY_LOW=1,
+    SEVERITY_MEDIUM,
+    SEVERITY_HIGH,
+    SEVERITY_CRITICAL,
+    SEVERITY_USER_RESPONSE
+};
+
+// https://github.com/diydrones/ardupilot/search?q=%23define+THISFIRMWARE
+// Actual for #define THISFIRMWARE "ArduCopter V3.3-dev"
+//
+// https://github.com/diydrones/ardupilot/blob/master/ArduCopter/defines.h
+//
+*/
 
 #define header_value   0x5e
 #define tail_value     0x5e
@@ -38,6 +68,17 @@ typedef unsigned char byte;
 #define FUEL           0x4
 #define TEMP2          0x5
 #define INDVOLT        0x6
+#define VCC            0x7
+//#define unused       0x8
+#define GPSALTd        0x9
+/* Mavlink data start */
+#define HOME_DIR       0xA
+#define HOME_DIST      0xB
+#define CPU_LOAD       0xC
+#define GPS_HDOP       0xD
+#define WP_NUM         0xE
+#define WP_BEARING     0xF
+/* Mavlink data end */
 #define ALTITUDE       0x10
 #define GPSSPEED       0x11
 #define LONGITUDE      0x12
@@ -47,19 +88,33 @@ typedef unsigned char byte;
 #define YEAR           0x16
 #define TIME           0x17
 #define SECOND         0x18
+//#define unused       0x19
+//#define unused       0x1A
+//#define unused       0x1B
+//#define unused       0x1C
+/* Mavlink data start */
 #define BASEMODE       0x1D
 #define WP_DIST        0x1E
 #define HEALTH         0x1F
 #define STATUS_MSG     0x20
+/* Mavlink data end */
 #define ALTIDEC        0x21
 #define EASTWEST       0x22
 #define NORTHSOUTH     0x23
 #define ACCX           0x24
 #define ACCY           0x25
 #define ACCZ           0x26
-#define CURRENT        0x28
-#define VOLTAGE        0x3A
-#define VOLTAGEDEC     0x3B
+#define VerticalSpeed  0x27
+#define CURRENT        0x28 
+//#define unused       0x29
+//#define unused       0x2A
+//#define FR_VSPD        0x30 // 0x30 -> 0x27
+#define VOLTAGE        0x3A 
+#define VOLTAGEDEC     0x3B 
+
+// MAVLink HeartBeat bits
+#define MOTORS_ARMED 7  // 128
+#define MSG_TIMER 30    // 30 sec
 
 /*
 0x01  GPS Altitude          M     int16
@@ -109,4 +164,5 @@ typedef unsigned char byte;
 */
 
 #endif
+
 

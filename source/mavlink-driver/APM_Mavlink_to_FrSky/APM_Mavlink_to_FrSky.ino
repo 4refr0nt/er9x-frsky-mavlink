@@ -1,30 +1,30 @@
 /*
-	@author 	Nils Högberg
-	@contact 	nils.hogberg@gmail.com
- 	@coauthor(s):
-	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
+   @author    Nils HÑ†gberg
+   @contact    nils.hogberg@gmail.com
+    @coauthor(s):
+     Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+// Version 1.1.114
+
 #undef PROGMEM 
 #define PROGMEM __attribute__(( section(".progmem.data") )) 
 
 #undef PSTR 
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
-
-// comment this line to use with TARANIS transmitter, uncomment for er9x-based transmitters
-#define ER9X
 
 #include <SoftwareSerial.h>
 #include <FlexiTimer2.h>
@@ -36,13 +36,13 @@
 #include <GCS_MAVLink.h>
 
 #define HEARTBEATLED 13
-#define HEARTBEATFREQ 500
+#define HEARTBEATFREQ 100
 
 // Do not enable both at the same time
-//#define DEBUG
+#define DEBUG
 //#define DEBUGFRSKY
 
-// Comment this to run simple telemetry protocl
+// Comment this to run simple telemetry protocol
 #define MAVLINKTELEMETRY
 
 #ifdef MAVLINKTELEMETRY
@@ -61,83 +61,81 @@ SoftwareSerial *debugSerial;
 SoftwareSerial *frskyDebugSerial;
 #endif
 
-SimpleFIFO<char, 128> queue;
+#define Q_BUFF 128
+SimpleFIFO<char, Q_BUFF> queue;
 
-int		counter = 0;
-unsigned long	hbMillis = 0;
-unsigned long	rateRequestTimer = 0;
-byte	hbState;
-bool	firstParse = false;
+int      counter = 0;
+unsigned long   hbMillis = 0;
+unsigned long   rateRequestTimer = 0;
+byte   hbState;
 
 void setup() {
 
 // Debug serial port pin 11 rx, 12 tx
 #ifdef DEBUG
-	debugSerial = new SoftwareSerial(12, 11);
-	debugSerial->begin(38400);
+   debugSerial = new SoftwareSerial(11, 12);
+   debugSerial->begin(38400);
+   debugSerial->flush();
 #elif defined DEBUGFRSKY
-	frskyDebugSerial = new SoftwareSerial(12, 11);
-	frskyDebugSerial->begin(38400);
+   frskyDebugSerial = new SoftwareSerial(11, 12);
+   frskyDebugSerial->begin(38400);
 #endif
-	
-	// FrSky data port pin 6 rx, 5 tx
-	frSkySerial = new SoftwareSerial(6, 5, true);
-	frSkySerial->begin(9600);
-	// Incoming data from APM
-	Serial.begin(57600);
-	Serial.flush();
-	
+   
+   // FrSky data port pin 6 rx, 5 tx
+   frSkySerial = new SoftwareSerial(6, 5, true);
+   frSkySerial->begin(9600);
+   // Incoming data from APM
+   Serial.begin(57600);
+   Serial.flush();
+   
 #ifdef DEBUG
-	debugSerial->println("Initializing...");
-	debugSerial->print("Free ram: ");
-	debugSerial->print(freeRam());
-	debugSerial->println(" bytes");
+   debugSerial->println("");
+   debugSerial->println("Mavlink to FrSky converter start");
+   debugSerial->println("Initializing...");
+   debugSerial->print("Free ram: ");
+   debugSerial->print(freeRam());
+   debugSerial->println(" bytes");
 #endif
+   digitalWrite(HEARTBEATLED, HIGH);
+   hbState = HIGH;
 #ifdef MAVLINKTELEMETRY
-	dataProvider = new Mavlink(&Serial);
-#ifdef ER9X
-        dataProvider->er9xEnable();
+   dataProvider = new Mavlink(&Serial);
 #else
-        dataProvider->er9xDisable();
-#endif
-#else
-	dataProvider = new SimpleTelemetry();
-#endif
-	
-	
-	frSky = new FrSky();
-
-	digitalWrite(HEARTBEATLED, HIGH);
-	hbState = HIGH;
-
-	FlexiTimer2::set(250, 1.0/1000, sendFrSkyData); // call every 250 1ms "ticks"
-	FlexiTimer2::start();
-
+   dataProvider = new SimpleTelemetry();
+#endif 
+   frSky = new FrSky();
 #ifdef DEBUG
-	debugSerial->println("Waiting for APM to boot.");
+   debugSerial->println("Waiting for APM to boot...");
 #endif
-
-	// Blink fast a couple of times to wait for the APM to boot
-	for (int i = 0; i < 250; i++)
-	{
-		if (i % 2)
-		{
-			digitalWrite(HEARTBEATLED, HIGH);
-			hbState = HIGH;
-		}
-		else
-		{
-			digitalWrite(HEARTBEATLED, LOW);
-			hbState = LOW;
-		}
-		delay(50);
-	}
-
+   // Blink fast a couple of times to wait for the APM to boot
+   for (int i = 0; i < 200; i++)
+   {
+      if (i % 2)
+      {
 #ifdef DEBUG
-	debugSerial->println("Initialization done.");
-	debugSerial->print("Free ram: ");
-	debugSerial->print(freeRam());
-	debugSerial->println(" bytes");
+   debugSerial->print(".");
+#endif
+         digitalWrite(HEARTBEATLED, HIGH);
+         hbState = HIGH;
+      }
+      else
+      {
+         digitalWrite(HEARTBEATLED, LOW);
+         hbState = LOW;
+      }
+      delay(50);
+   }
+#ifdef DEBUG
+   debugSerial->println("");
+   debugSerial->println("Starting Timer...");
+#endif
+   FlexiTimer2::set(200, 1.0/1000, sendFrSkyData); // call every 200 1ms "ticks"
+   FlexiTimer2::start();
+#ifdef DEBUG
+   debugSerial->println("Initialization done.");
+   debugSerial->print("Free ram after setup: ");
+   debugSerial->print(freeRam());
+   debugSerial->println(" bytes");
 #endif
 
 }
@@ -145,120 +143,97 @@ void setup() {
 void loop() {
 
 #ifdef MAVLINKTELEMETRY
-	if( dataProvider->enable_mav_request || (millis() - dataProvider->lastMAVBeat > 5000) )
-	{
-		if(millis() - rateRequestTimer > 2000)
-		{
-#ifdef ER9X
-        if(millis() - dataProvider->lastMAVBeat > 3000)
-        {
-                dataProvider->reset();
+   if( dataProvider->enable_mav_request || ((millis() - dataProvider->lastMAVBeat) > 3000) )
+   {
+         Serial.flush();
+		 queue.flush();
+         dataProvider->reset();
+         for(int n = 0; n < 3; n++)
+         {
 #ifdef DEBUG
-                debugSerial->println("No Mavlink heartbeat packets. Reset variables.");
+            debugSerial->print("Making rate request. ");
+            debugSerial->println(millis() - dataProvider->lastMAVBeat);
 #endif
-        }
-#endif
-			for(int n = 0; n < 3; n++)
-			{
-#ifdef DEBUG
-				debugSerial->println("Making rate request.");
-#endif
-				dataProvider->makeRateRequest();
-				delay(50);
-			}
-			
-			dataProvider->enable_mav_request = 0;
-			dataProvider->waitingMAVBeats = 0;
-			rateRequestTimer = millis();
-		}
-		
-	}
+            dataProvider->makeRateRequest();
+            delay(50);
+         }
+         dataProvider->enable_mav_request = 0;
+         delay(1000);
+         dataProvider->reset();
+   }
 #endif
 
-	while (Serial.available() > 0)
-	{
-		if (queue.count() < 128)
-		{
-			char c = Serial.read();
-			queue.enqueue(c);
-		}
-		else
-		{
+   while (Serial.available() > 0)
+   {
+      char c = Serial.read();
+      if (queue.count() > Q_BUFF)
+      {
 #ifdef DEBUG
-			debugSerial->println("QUEUE IS FULL!");
+         debugSerial->println("QUEUE IS FULL!");
+		 queue.flush();
 #endif
-		}
-	}
-	
-	processData();
-	updateHeartbeat();
+      }
+      queue.enqueue(c);
+   }
+
+   processData();
+   updateHeartbeat();
 }
 
 void updateHeartbeat()
 {
-	long currentMilillis = millis();
-	if(currentMilillis - hbMillis > HEARTBEATFREQ) {
-		hbMillis = currentMilillis;
-		if (hbState == LOW)
-		{
-			hbState = HIGH;
-		}
-		else
-		{
-			hbState = LOW;
-		}
-		digitalWrite(HEARTBEATLED, hbState); 
-	}
+   if(millis() - hbMillis > HEARTBEATFREQ) {
+      hbMillis = millis();
+      if (hbState == LOW)
+      {
+         hbState = HIGH;
+      }
+      else
+      {
+         hbState = LOW;
+      }
+      digitalWrite(HEARTBEATLED, hbState); 
+   }
 }
 
 void sendFrSkyData()
 {
-	counter++;
-	
-	if (counter >= 20)			 // Send 5000 ms frame
-	{
-		frSky->sendFrSky05Hz(frSkySerial, dataProvider);
-		counter = 0;
-	}
-	else if ((counter % 4) == 0) // Send 1000 ms frame
-	{
-		frSky->sendFrSky1Hz(frSkySerial, dataProvider);
+   counter++;
+   if ((counter % 25) == 0)          // Send 5000 ms frame
+   {
+      counter = 0;
+      frSky->sendFrSky05Hz(frSkySerial, dataProvider);
+   } 
+   if ((counter % 5) == 0) {    // Send 1000 ms frame
+      frSky->sendFrSky1Hz(frSkySerial, dataProvider);
 #ifdef DEBUG
-		frSky->printValues(debugSerial, dataProvider);
+      frSky->printValues(debugSerial, dataProvider);
 #endif
-	}
-	else						 // Send 250 ms frame
-	{
-		frSky->sendFrSky5Hz(frSkySerial, dataProvider);
-	}	
+      if ( dataProvider->msg_timer > 0 ) {
+         dataProvider->msg_timer -= 1;  // counter -1 sec
+      }
+   } else {
+   // Send 200 ms frame
+      frSky->sendFrSky5Hz(frSkySerial, dataProvider);
+   }
 }
 
 void processData()
 {  
-	while (queue.count() > 0)
-	{ 
-		bool done = dataProvider->parseMessage(queue.dequeue());
-
-		if (done && !firstParse)
-		{
-			firstParse = true;
+   while (queue.count() > 0)
+   { 
+      int msg = dataProvider->parseMessage(queue.dequeue());
 #ifdef DEBUG
-			debugSerial->println("First parse done. Start sending on frSky port.");
+      if (msg >= 0) {
+	     dataProvider->printMessage(debugSerial, dataProvider, msg);
+	  }
 #endif
-		}
-	}
+   }
 }
-
 
 int freeRam () {
-	extern int __heap_start, *__brkval; 
-	int v; 
-	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+   extern int __heap_start, *__brkval; 
+   int v; 
+   return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
-
-
-
-
-
-
 

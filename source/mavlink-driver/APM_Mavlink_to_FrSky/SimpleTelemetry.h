@@ -1,5 +1,5 @@
 /*
-	@author 	Nils Högberg
+	@author 	Nils HÑ†gberg
 	@contact 	nils.hogberg@gmail.com
 
 	This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ public:
 	SimpleTelemetry(void);
 	~SimpleTelemetry(void);
 	bool		parseMessage(char c);
-	const float	getGpsHdop();
+	const int	getGpsHdop();
 	int			terms();
 	char*		term(int i);
 	float		termToDecimal(int t);
@@ -100,3 +100,4 @@ private:
 };
 
 #endif
+

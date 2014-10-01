@@ -49,3 +49,4 @@ void FrSkySPort::sendData(IFrSkyDataProvider* dataProvider)
   }
   counter = (counter + 1) & 1 ;
 }
+

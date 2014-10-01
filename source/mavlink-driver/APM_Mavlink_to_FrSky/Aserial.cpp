@@ -375,3 +375,4 @@ void initSportUart( struct t_sportData *pdata )
 #endif
 }
 */
+
