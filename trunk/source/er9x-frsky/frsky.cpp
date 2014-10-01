@@ -58,16 +58,23 @@ const prog_uint8_t APM Fr_indices[] =
 	FR_RPM,
 	FR_FUEL,
 	FR_TEMP2,
-	FR_CELL_V,
-	HUBDATALENGTH-1,HUBDATALENGTH-1,
-	FR_GPS_ALTd,
-	HUBDATALENGTH-1,HUBDATALENGTH-1,
-	HUBDATALENGTH-1,HUBDATALENGTH-1,HUBDATALENGTH-1,HUBDATALENGTH-1,
-	FR_ALT_BARO | 0x80,
-	FR_GPS_SPEED | 0x80,
-	FR_GPS_LONG | 0x80,
-	FR_GPS_LAT | 0x80,
-	FR_COURSE,
+	FR_CELL_V,        // 0x06
+	FR_VCC,           // 0x07  Extra data for Mavlink via FrSky
+	HUBDATALENGTH-1,  // 0x08
+	FR_GPS_ALTd,      // 0x09
+/* Extra data 1 for Mavlink via FrSky */
+	FR_HOME_DIR,      // 0x0A
+	FR_HOME_DIST,     // 0x0B
+	FR_CPU_LOAD,      // 0x0C
+	FR_GPS_HDOP,      // 0x0D
+	FR_WP_NUM,        // 0x0E
+	FR_WP_BEARING,    // 0x0F
+/* Extra data 1 for Mavlink via FrSky */
+	FR_ALT_BARO | 0x80,  // 0x10
+	FR_GPS_SPEED | 0x80, // 0x11
+	FR_GPS_LONG | 0x80,  // 0x12
+	FR_GPS_LAT | 0x80,   // 0x13
+	FR_COURSE,           // 0x14
 	FR_GPS_DATMON,
 	FR_GPS_YEAR,
 	FR_GPS_HRMIN,
@@ -76,22 +83,22 @@ const prog_uint8_t APM Fr_indices[] =
 	FR_GPS_LONGd,
 	FR_GPS_LATd,
 	FR_COURSEd,
-/* Extra data for Mavlink via FrSky */
+/* Extra data 2 for Mavlink via FrSky */
 	FR_BASEMODE,
 	FR_WP_DIST,
 	FR_HEALTH,
 	FR_MSG,
-/* Extra data for Mavlink via FrSky */
+/* Extra data 2 for Mavlink via FrSky */
 	FR_ALT_BAROd,
 	FR_LONG_E_W,
 	FR_LAT_N_S,
 	FR_ACCX,
 	FR_ACCY,
-	FR_ACCZ,
+	FR_ACCZ,  // 0x26
 	FR_VSPD,
 	FR_CURRENT,
-	FR_V_AMP | 0x80,
-	FR_V_AMPd,
+	FR_V_AMP | 0x80, // 0x29
+	FR_V_AMPd,       // 0x2A
 	HUBDATALENGTH-1,
 	HUBDATALENGTH-1
 } ;
@@ -355,14 +362,14 @@ void frsky_proc_user_byte( uint8_t byte )
 						if ( byte > 57 )
 						{
 							byte -= 17 ;		// Move voltage-amp sensors							
-						}									// 58->41, 59->42
-						if ( byte == 48 )
+						}									// 58->41 (3A->29), 59->42 (3B->2A)
+						if ( byte == 48 ) // 0x30
 						{
-							byte = FR_VSPD ;		// Move Vario							
+							byte = FR_VSPD; // Move Vario FR_VSPD=39 0x27
 						}
-						if ( byte == 57 )
+						if ( byte == 57 )  // 0x39
 						{
-							byte = FR_VOLTS ;		// Move Oxsensor voltage
+							byte = FR_VOLTS ;		// Move Oxsensor voltage FR_VOLTS=38 0x26
 						}
 						if ( byte > sizeof(Fr_indices) )
 						{
@@ -1304,13 +1311,19 @@ void resetTelemetry( uint8_t first )
 	FrskyHubData[FR_CELL_MIN] = 0 ;			// 0 volts
 	Frsky_Amp_hour_prescale = 0 ;
 	FrskyHubData[FR_AMP_MAH] = 0 ;
-	FrskyHubData[FR_TEMP1] = 98 ;
+	FrskyHubData[FR_TEMP1] = 98 ; // NO DRV
 	FrskyHubData[FR_WP_DIST] = 0 ;
-	FrskyHubData[FR_MSG] = 0 ;
+	FrskyHubData[FR_WP_NUM] = 0 ;
+	FrskyHubData[FR_HOME_DIST] = 0 ;
+	FrskyHubData[FR_CPU_LOAD]  = 0 ;
+	FrskyHubData[FR_HEALTH]    = 0 ;
+	FrskyHubData[FR_GPS_HDOP]  = 999;
 	if ( first ) {
-		FrskyHubData[FR_BASEMODE] = 0 ; // clearimg Arming flag only for first time
-		FrskyHubData[FR_HEALTH] = 32 ;  // GPS ERR - cleared when telemetry packet received
-	}
+		FrskyHubData[FR_BASEMODE]   = 0;    // clearimg Arming flag only for first time
+        FrskyHubData[FR_WP_BEARING] = 270;
+	    FrskyHubData[FR_HOME_DIR]   = 90;
+		FrskyHubData[FR_COURSE]     = 270;
+    }
   memset( &FrskyHubMaxMin, 0, sizeof(FrskyHubMaxMin));
 }
 

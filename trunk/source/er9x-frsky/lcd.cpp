@@ -477,7 +477,7 @@ void lcd_hbar( uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t percent )
 		}
 	}
 }
-
+/*
 void lcd_vbar( uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t percent )
 {
 	uint8_t solid ;
@@ -502,6 +502,7 @@ void lcd_vbar( uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t percent )
 		}
 	}
 }
+*/
 // Reverse video 8 pixels high, w pixels wide
 // Vertically on an 8 pixel high boundary
 void lcd_char_inverse( uint8_t x, uint8_t y, uint8_t w, uint8_t blink )

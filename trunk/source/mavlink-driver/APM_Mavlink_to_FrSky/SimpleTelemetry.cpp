@@ -1,5 +1,5 @@
 /*
-	@author 	Nils Högberg
+	@author 	Nils HÑ†gberg
 	@contact 	nils.hogberg@gmail.com
 
 	This program is free software: you can redistribute it and/or modify
@@ -240,9 +240,9 @@ const float SimpleTelemetry::getGpsAltitude()
 	return termToDecimal(6) / 100.0f;
 }
 
-const float SimpleTelemetry::getGpsHdop()
+const int SimpleTelemetry::getGpsHdop()
 {
-	return termToDecimal(7) / 100.0f;
+	return termToDecimal(7) / 100;
 }
 
 const int SimpleTelemetry::getTemp2()
@@ -382,3 +382,4 @@ int SimpleTelemetry::_dehex(char a) {
     return int(a)-48;
   }
 }
+

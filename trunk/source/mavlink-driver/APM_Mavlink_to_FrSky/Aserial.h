@@ -24,3 +24,4 @@ void setNewData( struct t_sportData *pdata, uint16_t id, uint32_t value ) ;
 void initSportUart( struct t_sportData *pdata ) ;
 
 extern uint8_t DataSent;
+

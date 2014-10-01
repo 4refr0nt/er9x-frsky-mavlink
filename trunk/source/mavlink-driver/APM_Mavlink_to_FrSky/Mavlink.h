@@ -1,21 +1,21 @@
 /*
-	@author 	Nils Högberg
-	@contact 	nils.hogberg@gmail.com
- 	@coauthor(s):
-	  Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
+   @author    Nils HÑ†gberg
+   @contact    nils.hogberg@gmail.com
+    @coauthor(s):
+     Victor Brutskiy, 4refr0nt@gmail.com, er9x adaptation
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #ifndef mavlink_h
 #define mavlink_h
@@ -28,89 +28,117 @@
 //#include <../Libraries/GCS_MAVLink/GCS_MAVLink.h>
 //#include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
 //#include "../GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/mavlink.h"
+#include "defines.h"
 
-// MAVLink HeartBeat bits
-#define MOTORS_ARMED 128
-
-class Mavlink :	public IFrSkyDataProvider
+class Mavlink :   public IFrSkyDataProvider
 {
 public:
-	Mavlink(BetterStream* port);
-	~Mavlink(void);
-	bool			parseMessage(char c);
-	void			makeRateRequest();
-	bool			enable_mav_request;
-	bool			mavlink_active;
-	bool			waitingMAVBeats;
-        bool                    er9x;
-	unsigned long	lastMAVBeat;
-	const int		getGpsStatus();
-	const float		getGpsHdop();
-	mavlink_statustext_t	status;
+   Mavlink(BetterStream* port);
+   ~Mavlink(void);
+   int             parseMessage(char c);
+   void            makeRateRequest();
+   bool            enable_mav_request;
+   unsigned long   lastMAVBeat;
+   const int       getGpsStatus();
+   unsigned int    msg_timer;
+   void            printMessage(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProvider, int msg);
 
-	// IFrSkyDataProvider functions
-	const float		getGpsAltitude();
-	const int		getTemp1();
-	const int		getEngineSpeed();
-	const int		getFuelLevel();
-	const int		getTemp2();
-	const float		getAltitude();
-	const float		getGpsGroundSpeed();
-	const float		getLongitud();
-	const float		getLatitude();
-	const float		getCourse();
-	const int		getYear();
-	const int		getDate();
-	const int		getTime();
-	const float		getAccX();
-	const float		getAccY();
-	const float		getAccZ(); 
-	const float		getBatteryCurrent();
-	const float		getMainBatteryVoltage();
-	void			reset();
-	const int		er9xEnable();
-	const int       er9xDisable();
-    const int       getEr9x();
-    const int       getBaseMode();
-    const int       getWPdist();
-    const int       getHealth();
+   // IFrSkyDataProvider functions
+   const float     getGpsAltitude();
+   const int       getTemp1();
+   const int       getEngineSpeed();
+   const int       getFuelLevel();
+   const int       getTemp2();
+   const float     getAltitude();
+   const float     getGpsGroundSpeed();
+   const float     getLongitud();
+   const float     getLatitude();
+   const float     getCourse();
+   const int       getYear();
+   const int       getDate();
+   const int       getTime();
+   const float     getAccX();
+   const float     getAccY();
+   const float     getAccZ(); 
+   const float     getBatteryCurrent();
+   const float     getMainBatteryVoltage();
+   void            reset();
+   const int       getBaseMode();
+   const int       getWP_dist();
+   const int       getWP_num();
+   const int       getWP_bearing();
+   const int       getHealth();
+   const int       getHome_dir();
+   const int       getHome_dist();
+   const int       getCpu_load();
+   const int       getVcc();
+   const int       getGpsHdop();
+   const int       getStatus_msg();
+   const int       getNCell();
+   const int       getCell();
+   const int       parse_msg();
+   const bool      isArmed();
+   void            setHomeVars();
+   boolean         getBit(byte Reg, byte whichBit);
+   float           home_alt;
+   float           home_gps_alt;
+   float           alt;
+   float           gps_alt;
+   float           home_lat;
+   float           home_lon;
+   float           lat;
+   float           lon;
+   bool            ok;
 private:
-	SoftwareSerial  *debugPort;
-	float			gpsDdToDmsFormat(float ddm);
-	bool			mavbeat;
-	unsigned int	apm_mav_type;
-	unsigned int	apm_mav_system; 
-	unsigned int	apm_mav_component;
-	unsigned int	crlf_count;
-	int				packet_drops;
-	int				parse_error;
+   SoftwareSerial  *debugPort;
+   float           gpsDdToDmsFormat(float ddm);
+   bool            mavbeat;
+   unsigned int    apm_mav_type;
+   unsigned int    apm_mav_system; 
+   unsigned int    apm_mav_component;
+   unsigned int    crlf_count;
+   int             packet_drops;
+   int             parse_error;
+   double          scaleLongDown;
+   double          scaleLongUp;
+   float           rads;
+   const bool      compare_msg(char *string);
 
-	// Telemetry values
-	float			batteryVoltage;
-	float			current;
-	int				batteryRemaining;
-	int				gpsStatus;
-	float			latitude;
-	float			longitude;
-	float			gpsAltitude;
-	float			gpsHdop;
-	int				numberOfSatelites;
-	float			gpsGroundSpeed;
-	float			gpsCourse;
-	float			altitude;
-	int				apmMode;
-	int				apmBaseMode;
-	float			course;
-	float			throttle;
-	float			accX;
-	float			accY;
-	float			accZ;
-	unsigned int	sensors_health;
-	unsigned int	cpu_load;
-	float			cpu_voltage;
-	unsigned int	wp_dist;
-	unsigned int	last_message_severity;
-	char			last_message_text[50];
+   // Telemetry values
+   float           batteryVoltage;
+   int             current;
+   int             batteryRemaining;
+   int             gpsStatus;
+   float           latitude;
+   float           longitude;
+   float           gpsAltitude;
+   unsigned int    gpsHdop;
+   int             numberOfSatelites;
+   float           gpsGroundSpeed;
+   float           gpsCourse;
+   float           altitude;
+   int             apmMode;
+   int             apmBaseMode;
+   int             course;
+   int             home_course;
+   unsigned int    throttle;
+   float           accX;
+   float           accY;
+   float           accZ;
+   int             sensors_health;
+   int             cpu_load;
+   int             cpu_vcc;
+   unsigned int    wp_dist;
+   int             wp_num;
+   int             wp_bearing;
+   int             home_direction;
+   unsigned int    home_distance;
+   int             last_message_severity;
+   char            last_message_text[50];
+   unsigned int    status_msg;
+   bool            motor_armed;
+   unsigned int    ncell;
+   unsigned int    cell;
 };
 #define MAV_SYS_STATUS_SENSOR_3D_GYRO 1 /* 0x01 3D gyro | */
 #define MAV_SYS_STATUS_SENSOR_3D_ACCEL 2 /* 0x02 3D accelerometer | */
@@ -134,5 +162,4 @@ private:
 #define MAV_SYS_STATUS_SENSOR_3D_MAG2 524288 /* 0x80000 2nd 3D magnetometer | */
 #define MAV_SYS_STATUS_GEOFENCE 1048576 /* 0x100000 geofence | */
 #define MAV_SYS_STATUS_AHRS 2097152 /* 0x200000 AHRS subsystem health | */
-//#define MAV_SYS_STATUS_SENSOR_ENUM_END 2097153 /*  | */
 #endif

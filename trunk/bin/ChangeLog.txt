@@ -1,0 +1,13 @@
+Version 1.1.114
+02.10.2014
+
+* rearrange mavlink telemetry screen
++ add GPS hdop
++ add Distance to home position
++ add Bearing  to home position
++ add cpu load
++ add blinking flight mode when telemetry link fail
++ add baro alt
++ add gps alt
++ DGPS, RTK modes
+- remove accX, accY, accZ

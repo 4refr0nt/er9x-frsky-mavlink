@@ -25,6 +25,9 @@
 # To rebuild project do "make clean" then "make all".
 #----------------------------------------------------------------------------
 
+REV = $(shell echo $$(( 1   )))
+VER = $(shell echo $$(( 114 )))
+
 
 # MCU name
 ifeq ($(CPU), 2561)
@@ -535,8 +538,7 @@ WINSHELL = cmd
 
 # th9x/er9x-specific
 XBM2LBM = ruby ../util/xbm2lbm.rb
-AREV = $(shell sh -c "cat ../../.svn/entries")
-REV = $(shell echo $$(( $(AREV) + 1 )))
+#AREV = $(shell sh -c "cat ../../.svn/entries")
 
 
 # Define Messages
@@ -579,9 +581,7 @@ ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS) $(GENDEPFLAGS)
 ALL_CPPFLAGS = -mmcu=$(MCU) -I. -x c++ $(CPPFLAGS) $(GENDEPFLAGS)
 ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
-AVER = ${shell sh -c "grep \"SUB_VERS\" stamp-er9x.h | egrep -o \"[[:digit:]]*\""}
-VER = $(shell echo $$(( $(AVER) + 1 )))
-
+#AVER = ${shell sh -c "grep \"SUB_VERS\" stamp-er9x.h | egrep -o \"[[:digit:]]*\""}
 
 
 # Default target.
@@ -611,7 +611,7 @@ stamp:
 	@echo "#define DATE_STR \"`date +%d.%m.%Y`\"" >> stamp-er9x.h
 	@echo "#define TIME_STR \"`date +%H:%M:%S`\"" >> stamp-er9x.h
 	@echo "#define SUB_VERS $(VER)" >> stamp-er9x.h
-	@echo "#define SVN_VERS \"er9x-mav-r$(REV)\"" >> stamp-er9x.h
+	@echo "#define SVN_VERS \"1.$(REV).$(VER)\"" >> stamp-er9x.h
 	@echo "#define MOD_VERS \"$(EXT_MOD) $(HT_MOD) $(BEEPER_MOD) $(CPU_MOD) $(SC_MOD) \"" >> stamp-er9x.h
 #	@cat stamp-er9x.h
 

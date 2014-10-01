@@ -1,5 +1,5 @@
 /*
-	@author 	Nils Högberg
+	@author 	Nils HÑ†gberg
 	@contact 	nils.hogberg@gmail.com
 
 	This program is free software: you can redistribute it and/or modify
@@ -44,5 +44,6 @@ private:
 		byte				lsByte(int value);
 		byte				msByte(int value);
 };
-
+int freeRam ();
 #endif
+
