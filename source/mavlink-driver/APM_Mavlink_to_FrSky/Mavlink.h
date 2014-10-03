@@ -80,7 +80,6 @@ public:
    const bool      isArmed();
    void            setHomeVars();
    boolean         getBit(byte Reg, byte whichBit);
-   float           home_alt;
    float           home_gps_alt;
    float           alt;
    float           gps_alt;

@@ -93,7 +93,6 @@ Mavlink::Mavlink(BetterStream* port)
    wp_bearing = 270;
    sensors_health = 0;
    last_message_severity = 0;
-   home_alt = 0;
    home_gps_alt = 0;
    alt = 0;
    gps_alt = 0;
@@ -167,8 +166,7 @@ const float Mavlink::getGpsGroundSpeed()
 
 const float Mavlink::getAltitude()
 {
-   setHomeVars();
-   return alt;
+   return altitude;
 }
 
 const int Mavlink::getTemp1()
@@ -579,7 +577,6 @@ void Mavlink::reset()
    wp_num = 0;
    wp_bearing = 270;
    sensors_health = 0;
-//   home_alt = 0;
 //   home_gps_alt = 0;
    alt = 0;
    gps_alt = 0;
@@ -601,7 +598,6 @@ void Mavlink::setHomeVars()
 	   } else {
 	      gps_alt = 0;
 	   }
-       alt = (altitude - home_alt);
        if (ok) {
           //DST to Home
           lat = latitude / 10000000.0f;
@@ -624,8 +620,6 @@ void Mavlink::setHomeVars()
           home_direction = 90;
        }
     } else {
-       home_alt = altitude;
-	   alt = altitude;
 	   home_course = getCourse();
        if ( gpsStatus > 0 ) {
           home_gps_alt = gpsAltitude;
@@ -640,6 +634,7 @@ void Mavlink::setHomeVars()
        } else {
           ok = false;
 		  gps_alt = 0;
+		  home_gps_alt = 0;
 	   }
     }
 }
