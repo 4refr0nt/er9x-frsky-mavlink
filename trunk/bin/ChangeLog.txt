@@ -1,3 +1,8 @@
+Version 1.1.115
+03.10.2014
+
+* baro alt bug fixed
+
 Version 1.1.114
 02.10.2014
 
