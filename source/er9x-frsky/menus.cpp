@@ -6768,25 +6768,29 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				lcd_puts_P( 0 * FW,   3*FH, PSTR(STR_MAV_GPS_SAT_COUNT) ); // sat
 				lcd_outdez( 7 * FW-2, 3*FH, gps_sat ) ;
 				// line 4 left
-				lcd_puts_P( 0 * FW,   4*FH, PSTR(STR_MAV_GPS_HDOP) ); // hdop
-				lcd_outdez( 7 * FW-2, 4*FH, FrskyHubData[FR_GPS_HDOP] ) ;
+                int16_t val;
+				val = FrskyHubData[FR_GPS_HDOP];
+				if (val <= 200) {
+                   attr  = PREC2;
+				   blink = 0;
+				 } else {
+                   attr = PREC2 | BLINK;
+				   blink = BLINK;
+				 }
+				lcd_putsAtt( 0 * FW,   4*FH, PSTR(STR_MAV_GPS_HDOP), blink ); 
+                lcd_outdezAtt( 7 * FW-2, 4*FH, val, attr ); // hdop
 				// line 5 left
-				//lcd_outdez( 7 * FW-2, 5*FH, frskyUsrStreaming ) ; // heartbeat
 				lcd_hbar( 0, 5*FH+1, 40, 4, frskyUsrStreaming ) ; // heartbeat
 				// line 2 right
 				lcd_puts_P( 15 * FW-1, 2*FH, PSTR(STR_MAV_ALT) ); // Alt
-                int16_t val;
-				val = getTelemetryValue(FR_ALT_BARO);
+				val = FrskyHubData[FR_ALT_BARO];
 				attr = 0;
-                if ( val < 1000 )
-			       {
-                       attr |= PREC1 ;
-                   }
-                else
-                   {
-                       val /= 10 ;
-                   }
-                lcd_outdezAtt( 21 * FW+1, 2*FH, val, attr ) ;
+                if ( val < 1000 ) {
+                    attr |= PREC1 ;
+                } else {
+                    val /= 10 ;
+                }
+                lcd_outdezAtt( 21 * FW+1, 2*FH, val, attr );
 				// line 3 right
 				lcd_puts_P( 15 * FW-1, 3*FH, PSTR(STR_MAV_GALT) ); // GAlt
 				lcd_outdez( 21 * FW+1, 3*FH, getTelemetryValue(FR_GPS_ALT) ) ;
@@ -6858,6 +6862,8 @@ const static prog_uint8_t APM xt[4] = {128*1/4+2, 4, 128-4, 128*3/4-2};
 				uint8_t y;
 				DO_SQUARE( x0, y0, r * 2 + 1 );
 				int16_t hdg = FrskyHubData[FR_COURSE];
+				hdg += 270;
+				if (hdg > 360) hdg -= 360; // normalization
 //				lcd_outdez( 15 * FW, 3 * FH, hdg ) ;
 				for (int8_t i = -3; i < r-1; i++)
 					{
