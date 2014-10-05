@@ -80,13 +80,14 @@ Mavlink::Mavlink(BetterStream* port)
    numberOfSatelites = 0;
    gpsGroundSpeed = 0;
    gpsCourse = 0;
-   altitude = 0;
+   altitude = 0.0f;
    apmMode = 99;
    course = 0;
+   home_course = 0;
    throttle = 0;
-   accX = 0;
-   accY = 0;
-   accZ = 0;
+//   accX = 0;
+//   accY = 0;
+//   accZ = 0;
    apmBaseMode = 0;
    wp_dist = 0;
    wp_num = 0;
@@ -151,6 +152,7 @@ const float Mavlink::getGpsAltitude()
 
 const int Mavlink::getGpsHdop()
 {
+   if ( gpsHdop > 999 ) gpsHdop = 999;
    return gpsHdop;
 }
 
@@ -180,18 +182,17 @@ const bool Mavlink::isArmed()
 }
 const float Mavlink::getCourse()
 {
-   int new_course;
+   int new_course; 
    if ( isArmed() ){
-      new_course = course - home_course + 270;
+      new_course = course - home_course;
 	} else {
-	  new_course = course + 270;
+	  new_course = course;
+	  home_course = course;
 	}
-    if (new_course < 0) { 
+   if (new_course < 0) { 
 	    new_course += 360;
-	} else if (new_course > 360) {
-	    new_course -= 360;
 	}
-    return new_course;
+    return new_course; // without normalization
 }
 
 const int Mavlink::getEngineSpeed()
@@ -199,6 +200,7 @@ const int Mavlink::getEngineSpeed()
    return throttle;
 }
 
+/*
 const float Mavlink::getAccX()
 {
    return accX;
@@ -228,6 +230,7 @@ const int Mavlink::getDate()
 {
    return 0;
 }
+*/
 const int Mavlink::getBaseMode()
 {
    return apmBaseMode;
@@ -242,7 +245,11 @@ const int Mavlink::getWP_num()
 }
 const int Mavlink::getWP_bearing()
 {
-   return wp_bearing;
+   int new_bearing = wp_bearing + 270;
+   if (new_bearing >= 360) {
+	  new_bearing -= 360;
+   }
+   return new_bearing; // normalized value
 }
 const int Mavlink::getHealth()
 {
@@ -251,7 +258,7 @@ const int Mavlink::getHealth()
 const int Mavlink::getHome_dir()
 {
    setHomeVars();
-   return home_direction;
+   return home_direction; // normalized value
 }
 const int Mavlink::getHome_dist()
 {
@@ -470,9 +477,9 @@ int Mavlink::parseMessage(char c)
             break;
             case MAVLINK_MSG_ID_ATTITUDE:
             {
-                //accX = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
-                //accY = ToDeg(mavlink_msg_attitude_get_roll(&msg));
-                //accZ = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
+//                accX = ToDeg(mavlink_msg_attitude_get_pitch(&msg));
+//                accY = ToDeg(mavlink_msg_attitude_get_roll(&msg));
+//                accZ = ToDeg(mavlink_msg_attitude_get_yaw(&msg));
                 return MAVLINK_MSG_ID_ATTITUDE;
             }
             break;
@@ -504,8 +511,8 @@ int Mavlink::parseMessage(char c)
         case MAVLINK_MSG_ID_STATUSTEXT:
           {   
             last_message_severity = mavlink_msg_statustext_get_severity(&msg);
+            mavlink_msg_statustext_get_text(&msg, last_message_text);
 			if (last_message_severity >= 3) {
-                mavlink_msg_statustext_get_text(&msg, last_message_text);
 			    status_msg = parse_msg();
 				msg_timer = MSG_TIMER;
 			}
@@ -513,8 +520,8 @@ int Mavlink::parseMessage(char c)
           }
           break;
          default:
-                //Do nothing
-                break;
+            return msg.msgid;
+            break;
     }
    }
    // Update global packet drops counter
@@ -541,8 +548,8 @@ void Mavlink::printMessage(SoftwareSerial* serialPort, IFrSkyDataProvider* dataP
     } else if (msg == MAVLINK_MSG_ID_MISSION_CURRENT) {
     } else if (msg == MAVLINK_MSG_ID_HWSTATUS) {
     } else {
-        serialPort->print("RCV: MAVLINK_MSG_ID ");
-        serialPort->println(msg);
+//        serialPort->print("RCV: MAVLINK_MSG_ID ");
+//        serialPort->println(msg);
     }
 }
 void Mavlink::reset()
@@ -560,14 +567,14 @@ void Mavlink::reset()
    numberOfSatelites = 0;
    gpsGroundSpeed = 0;
    gpsCourse = 0;
-   altitude = 0;
+   altitude = 0.0f;
    alt = 0;
    apmMode = 99; // if no mavlink packets
 //   course = 0;
    throttle = 0;
-   accX = 0;
-   accY = 0;
-   accZ = 0;
+//   accX = 0;
+//   accY = 0;
+//   accZ = 0;
    last_message_severity = 0;
    status_msg = 0;
    cpu_load = 0;
@@ -580,10 +587,8 @@ void Mavlink::reset()
 //   home_gps_alt = 0;
    alt = 0;
    gps_alt = 0;
-   home_distance = 0;
    lat = 0;
    lon = 0;
-//  home_direction = 90;
 }
 
 //------------------ Home Distance and Direction Calculation ----------------------------------
@@ -593,7 +598,7 @@ void Mavlink::setHomeVars()
     long bearing;
 
     if ( isArmed() ){
-       if ( gpsStatus > 0 ) {
+       if ( gpsStatus > 2 ) {
           gps_alt = (gpsAltitude - home_gps_alt);
 	   } else {
 	      gps_alt = 0;
@@ -620,12 +625,16 @@ void Mavlink::setHomeVars()
           home_direction = 90;
        }
     } else {
-	   home_course = getCourse();
-       if ( gpsStatus > 0 ) {
+	   home_course = course;
+       home_direction = 90;
+       home_distance = 0;
+       gps_alt = gpsAltitude;
+       if ( gpsStatus > 2 ) {
           home_gps_alt = gpsAltitude;
-		  gps_alt = gpsAltitude;
-          home_lat = lat / 10000000.0f;
-          home_lon = lon / 10000000.0f;
+          lat = latitude / 10000000.0f;
+          lon = longitude/ 10000000.0f;
+          home_lat = lat;
+          home_lon = lon;
           // shrinking factor for longitude going to poles direction
           rads = fabs(home_lat) * 0.0174532925;
           scaleLongDown = cos(rads);
@@ -633,8 +642,11 @@ void Mavlink::setHomeVars()
           ok = true;
        } else {
           ok = false;
-		  gps_alt = 0;
 		  home_gps_alt = 0;
+		  lat = 0.0f;
+		  lon = 0.0f;
+          home_lat = 0.0f;
+          home_lon = 0.0f;
 	   }
     }
 }

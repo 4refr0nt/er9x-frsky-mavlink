@@ -189,7 +189,14 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
 			frskyBuffer[bufferLength + 2] = lsByte((int)altitude);
 			frskyBuffer[bufferLength + 3] = msByte((int)altitude);
-			unsigned int temp = (unsigned int)((altitude - (int)altitude) * 100.0f);
+			unsigned int temp;
+			if ( altitude > 0 ) {
+			    temp = (unsigned int)((altitude - (unsigned int)altitude) * 100.0f);
+			} else if ( (altitude <= 0) && (altitude > -1) ) {
+			    temp = 0; // FrSky bug for values from 0.0 to -0.99
+			} else {
+			    temp = (unsigned int)((-altitude + (int)altitude) * 100.0f);
+			}
             frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = ALTIDEC;
 			frskyBuffer[bufferLength + 6] = lsByte(temp);
@@ -279,8 +286,8 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 			frskyBuffer[bufferLength + 7] = msByte(temp);
 			return 8;
 		}
-		break;
 /*
+		break;
 		case DATE :
 		{
 			frskyBuffer[bufferLength] = header_value;
@@ -570,8 +577,8 @@ void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProv
 //	serialPort->print(dataProvider->getTemp2());
 //	serialPort->print(" GPS speed: ");
 //	serialPort->print(dataProvider->getGpsGroundSpeed(), 2);
-	serialPort->print(" Home alt: ");
-	serialPort->print(dataProvider->getAltitude(), 2);
+	serialPort->print(" Alt: ");
+	serialPort->print(dataProvider->getAltitude(), 1);
 	serialPort->print(" GPS alt: ");
 	serialPort->print(dataProvider->getGpsAltitude(), 2);
 	serialPort->print(" Mode: ");

@@ -18,7 +18,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Version 1.1.115 03.10.2014
+// Version 1.1.117 03.10.2014
 
 #undef PROGMEM 
 #define PROGMEM __attribute__(( section(".progmem.data") )) 
@@ -35,12 +35,52 @@
 #include "SimpleFIFO.h"
 #include <GCS_MAVLink.h>
 
-#define HEARTBEATLED 13
-#define HEARTBEATFREQ 100
+//#define HEARTBEATLED 13
+//#define HEARTBEATFREQ 100
 
 // Do not enable both at the same time
-#define DEBUG
+//#define DEBUG
 //#define DEBUGFRSKY
+
+// Lighting
+// Output pins   ( Note: 5,6,11,12 already used by other needs )
+#define FRONT      7
+#define REAR       8
+#define LEFT       9
+#define RIGHT     10
+#define WHITE      2
+#define RED        3
+#define BLUE       4
+#define GREEN     13
+//static long p_preMillis;
+//static long p_curMillis;
+static int  pattern_index = 0;
+static int  last_mode = 0;
+
+char LEFT_STAB[]   PROGMEM = "1111111110";   // pattern for LEFT  light, mode - STAB
+char RIGHT_STAB[]  PROGMEM = "1111111110";   // pattern for RIGHT light, mode - STAB
+char FRONT_STAB[]  PROGMEM = "1111111110";   // pattern for FRONT light, mode - STAB
+char REAR_STAB[]   PROGMEM = "1111111110";   // pattern for REAR  light, mode - STAB
+
+char LEFT_AHOLD[]  PROGMEM = "111000";  // medium blink
+char RIGHT_AHOLD[] PROGMEM = "111000"; 
+char FRONT_AHOLD[] PROGMEM = "111000"; 
+char REAR_AHOLD[]  PROGMEM = "111000"; 
+
+char LEFT_RTL[]    PROGMEM = "10";  // fast blink
+char RIGHT_RTL[]   PROGMEM = "10"; 
+char FRONT_RTL[]   PROGMEM = "10"; 
+char REAR_RTL[]    PROGMEM = "10"; 
+
+char LEFT_OTHER[]  PROGMEM = "1";  // always ON
+char RIGHT_OTHER[] PROGMEM = "1"; 
+char FRONT_OTHER[] PROGMEM = "1"; 
+char REAR_OTHER[]  PROGMEM = "1"; 
+
+char *left[]  PROGMEM = {LEFT_STAB,  LEFT_AHOLD,  LEFT_RTL,  LEFT_OTHER };
+char *right[] PROGMEM = {RIGHT_STAB, RIGHT_AHOLD, RIGHT_RTL, RIGHT_OTHER};
+char *front[] PROGMEM = {FRONT_STAB, FRONT_AHOLD, FRONT_RTL, FRONT_OTHER};
+char *rear[]  PROGMEM = {REAR_STAB,  REAR_AHOLD,  REAR_RTL,  REAR_OTHER};
 
 // Comment this to run simple telemetry protocol
 #define MAVLINKTELEMETRY
@@ -64,10 +104,10 @@ SoftwareSerial *frskyDebugSerial;
 #define Q_BUFF 128
 SimpleFIFO<char, Q_BUFF> queue;
 
-int      counter = 0;
-unsigned long   hbMillis = 0;
+int counter = 0;
 unsigned long   rateRequestTimer = 0;
-byte   hbState;
+//unsigned long   hbMillis = 0;
+//byte   hbState;
 
 void setup() {
 
@@ -96,8 +136,6 @@ void setup() {
    debugSerial->print(freeRam());
    debugSerial->println(" bytes");
 #endif
-   digitalWrite(HEARTBEATLED, HIGH);
-   hbState = HIGH;
 #ifdef MAVLINKTELEMETRY
    dataProvider = new Mavlink(&Serial);
 #else
@@ -107,21 +145,26 @@ void setup() {
 #ifdef DEBUG
    debugSerial->println("Waiting for APM to boot...");
 #endif
+  // Initializing output pins
+  pinMode(LEFT, OUTPUT);
+  pinMode(RIGHT,OUTPUT);
+  pinMode(FRONT,OUTPUT);
+  pinMode(REAR, OUTPUT);
+  pinMode(RED,  OUTPUT);
+  pinMode(GREEN,OUTPUT);
+  pinMode(BLUE, OUTPUT);
+  pinMode(WHITE,OUTPUT);
+
    // Blink fast a couple of times to wait for the APM to boot
    for (int i = 0; i < 200; i++)
    {
       if (i % 2)
       {
-#ifdef DEBUG
-   debugSerial->print(".");
-#endif
-         digitalWrite(HEARTBEATLED, HIGH);
-         hbState = HIGH;
+         AllOn();
       }
       else
       {
-         digitalWrite(HEARTBEATLED, LOW);
-         hbState = LOW;
+         AllOff();
       }
       delay(50);
    }
@@ -129,7 +172,7 @@ void setup() {
    debugSerial->println("");
    debugSerial->println("Starting Timer...");
 #endif
-   FlexiTimer2::set(200, 1.0/1000, sendFrSkyData); // call every 200 1ms "ticks"
+   FlexiTimer2::set( 100, 1.0/1000, sendFrSkyData ); // call every 100 1ms "ticks"
    FlexiTimer2::start();
 #ifdef DEBUG
    debugSerial->println("Initialization done.");
@@ -142,11 +185,18 @@ void setup() {
 
 void loop() {
 
+//    if(millis() - p_preMillis > LOOPTIME) {
+      // save the last time you blinked the LED 
+//      p_preMillis = millis();   
+      // Update base lights
+//    }
+
+
 #ifdef MAVLINKTELEMETRY
-   if( dataProvider->enable_mav_request || ((millis() - dataProvider->lastMAVBeat) > 3000) )
+   if( dataProvider->enable_mav_request || ((millis() - dataProvider->lastMAVBeat) > 5000) )
    {
+     if(millis() - rateRequestTimer > 2000) {
          Serial.flush();
-		 queue.flush();
          dataProvider->reset();
          for(int n = 0; n < 3; n++)
          {
@@ -158,8 +208,8 @@ void loop() {
             delay(50);
          }
          dataProvider->enable_mav_request = 0;
-         delay(1000);
-         dataProvider->reset();
+         rateRequestTimer = millis();
+     }
    }
 #endif
 
@@ -177,9 +227,9 @@ void loop() {
    }
 
    processData();
-   updateHeartbeat();
+   //updateHeartbeat();
 }
-
+/*
 void updateHeartbeat()
 {
    if(millis() - hbMillis > HEARTBEATFREQ) {
@@ -195,16 +245,17 @@ void updateHeartbeat()
       digitalWrite(HEARTBEATLED, hbState); 
    }
 }
-
+*/
 void sendFrSkyData()
 {
+   updateLights(); // lights every 100ms
    counter++;
-   if ((counter % 25) == 0)          // Send 5000 ms frame
+   if ((counter % 50) == 0)          // Send 5000 ms frame
    {
       counter = 0;
       frSky->sendFrSky05Hz(frSkySerial, dataProvider);
    } 
-   if ((counter % 5) == 0) {    // Send 1000 ms frame
+   if ((counter % 10) == 0) {    // Send 1000 ms frame
       frSky->sendFrSky1Hz(frSkySerial, dataProvider);
 #ifdef DEBUG
       frSky->printValues(debugSerial, dataProvider);
@@ -212,7 +263,8 @@ void sendFrSkyData()
       if ( dataProvider->msg_timer > 0 ) {
          dataProvider->msg_timer -= 1;  // counter -1 sec
       }
-   } else {
+   }
+   if ( (counter % 2) == 0 ) {
    // Send 200 ms frame
       frSky->sendFrSky5Hz(frSkySerial, dataProvider);
    }
@@ -237,3 +289,106 @@ int freeRam () {
    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
+// Switch all outputs ON
+void AllOn() {
+#ifdef DEBUG
+   debugSerial->print(".");
+#endif
+    digitalWrite(LEFT,  1);
+    digitalWrite(RIGHT, 1);
+    digitalWrite(FRONT, 1);
+    digitalWrite(REAR,  1);
+
+    digitalWrite(RED,   1);
+    digitalWrite(WHITE, 1);
+    digitalWrite(BLUE,  1);
+    digitalWrite(GREEN, 1);
+}
+
+// Switch all outputs OFF
+void AllOff() {
+#ifdef DEBUG
+   debugSerial->print(".");
+#endif
+    digitalWrite(LEFT,  0);
+    digitalWrite(RIGHT, 0);
+    digitalWrite(FRONT, 0);
+    digitalWrite(REAR,  0);
+
+    digitalWrite(RED,   0);
+    digitalWrite(WHITE, 0);
+    digitalWrite(BLUE,  0);
+    digitalWrite(GREEN, 0);
+}
+// Updating base leds state
+void updateLights() {
+   int pin, index;
+   if ( dataProvider->motor_armed ) {
+      digitalWrite(WHITE, 1);
+   } else {
+      digitalWrite(WHITE, 0);
+   }
+   if ( (dataProvider->gpsStatus >= 3) && ( dataProvider->gpsHdop <= 200 ) ) {
+      digitalWrite(BLUE, 1);
+   } else {
+      digitalWrite(BLUE, 0);
+   }
+   if ( dataProvider->status_msg > 1) {
+      digitalWrite(RED, 1);
+   } else {
+      digitalWrite(RED, 0);
+   }
+   if (last_mode != dataProvider->apmMode) {
+      pattern_index = 0;
+	  last_mode = dataProvider->apmMode;
+   }
+   switch(last_mode) {
+   case 0: // STAB
+       index = 0;
+       break;
+   case 2: // AltHold
+       index = 1;
+       break;
+   case 6: // RTL
+       index = 2;
+       break;
+   default:
+       index = 3;
+       break;
+   }
+   pin = check_pattern((char*)pgm_read_word(&(left[index])));
+   digitalWrite(LEFT, pin);
+#ifdef DEBUG
+   debugSerial->print("LEFT LIGHT ");
+   debugSerial->print(pin);
+   debugSerial->print(" ");
+   debugSerial->println(pattern_index);
+#endif
+   pin = check_pattern((char*)pgm_read_word(&(right[index])));
+   digitalWrite(RIGHT, pin);
+   pin = check_pattern((char*)pgm_read_word(&(front[index])));
+   digitalWrite(FRONT, pin);
+   digitalWrite(GREEN, pin); // green led some as front light
+   pin = check_pattern((char*)pgm_read_word(&(rear[index])));
+   digitalWrite(REAR, pin);
+   pattern_index ++;
+   if (eol((char*)pgm_read_word(&(left[index])))) pattern_index = 0;
+}
+
+int check_pattern(char *string)
+{
+    int value = 0;
+    if ( pgm_read_byte( string + pattern_index ) == '1' )	{
+	   value = 1;
+	}
+	return value;
+}
+
+bool eol(char *string)
+{
+    bool value = false;
+    if ( pgm_read_byte( string + pattern_index ) == '\0' )	{
+	   value = true;
+	}
+	return value;
+}
