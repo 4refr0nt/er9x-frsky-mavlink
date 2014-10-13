@@ -1,66 +1,34 @@
 [https://code.google.com/p/er9x-frsky-mavlink/ English] [https://code.google.com/p/er9x-frsky-mavlink/wiki/Russian Russian]
 
+Обсуждение этого проекта на форумах:
+[http://forum.rcdesign.ru/f4/thread364947.html rcdesign.ru] на русском
+[http://www.rcgroups.com/forums/showthread.php?t=2170262 rcgroups.com] на английском
+[http://openrcforums.com/forum/viewtopic.php?f=5&t=5485&p=87943 openrcforums.com] на английском
 
-Этот проект позволяет пилотам отображать специфичные для Ardupilot данные на экране аппы Turnigy 9X и ее клонов без использования дополнительного радиоканала телеметрии на базе 3DR Radio или XBee. Для владельцев 3DR Radio или XBee появляется возможность отображения телеметрии как на наземной станции, так и на экране аппы.
+Этот проект позволяет пилотам отображать специфичные для Ardupilot (APM) данные на экране аппы Turnigy 9X и ее клонов без использования дополнительного радиоканала телеметрии на базе 3DR Radio или XBee. Передача данных происходит по радиоканалу телеметрии, реализованной в приемниках и ВЧ модулях FrSky. Для владельцев 3DR Radio или XBee появляется возможность отображения телеметрии как на наземной станции, так и на экране аппы.
+Телеметрия на страницах 1-4 отображает стандартные данные FrSky, включая данные хаба FrSky (за исключением temp1 и temp2)
+Успешно работает совместно с OSD и 3DR Radio.
 
-Проект содержит две прошивки: для аппы Turnigy 9X и для Arduino Pro Mini.
-Прошивка для Turnigy создана на основе популярной [https://code.google.com/p/er9x/ er9x прошивки r812] (добавлен экран №5 отображения данных, принимаемых от Ardupilot, остальное без изменений)
+8-ми канальное управление подсветкой (работает и без FrSky оборудования, не требуется прошивка аппы)
+Подробное описание настройки подсветки ниже, в вопросах и ответах
 
-Прошивка для Arduino основана на проекте [https://github.com/vizual54/APM-Mavlink-to-FrSky APM-Mavlink-to-FrSky for Taranis]
+Вам подойдет это решение, если Вы счастливый владелец следующего оборудования:
 
-
-Ardupilot -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky
-http://110.imagebam.com/download/366VpSAnf9JgHMUPLp2C1Q/32797/327961161/mavlink-frsky.jpg
-http://110.imagebam.com/download/-kdNbIi7uPIv0qLdzbkiIA/32797/327961796/displays.jpg
-
-===Отображаемые параметры===
-Напряжение и ток  с [http://store.3drobotics.com/products/apm-power-module-with-xt60-connectors модуля питания]
-
-Расчетный остаток заряда батареи модели
-
-Напряжение батареи аппы
-
-Полетный режим, включая FLIP и AUTOTUNE
-
-Arming/Disarming
-
-GPS: NO Fix, 2D Fix, 3D Fix
-
-Количество видимых спутников
-
-Уровень газа, отдаваемый ардупилотом на регуляторы (отличается от значения Thr на аппе)
-
-Heading - положение носа аппарата. В режиме Disarmed показывает положение носа по компасу (север - вверху)
-В режиме Arming показывает положение относительно взлета (как в SIMPLE режимах)
-
-"Здоровье" (health) сенсоров
-
-Расстояние до следующей WayPoint
+# Полетный контроллер c прошивкой [http://copter.ardupilot.com APM:Copter] или клон
+# Приемник FrSky с поддержкой телеметрии [http://www.frsky-rc.com/product/category.php?cate_id=16 D серии] ([http://www.frsky-rc.com/product/category.php?cate_id=17 S серия] с протоколом SPort не поддерживается)
+# ВЧ модуль передатчика FrSky [http://www.frsky-rc.com/product/category.php?cate_id=14 D серии]
+# Аппаратура [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=31544&aff=233755 Turnigy 9XR] или любой другой клон 9X
 
 
-Планируется в ближайших версиях:
+APM -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky
+https://er9x-frsky-mavlink.googlecode.com/svn/trunk/mavlink-frsky.jpg
 
 
-Отображение сообщений PreArm checks
+===Необходимое дополнительное оборудование===
 
-Сообщения системы уровней CRITICAL
+[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=26869&aff=233755 Arduino Pro Mini] рекомендуем версию с питанием 5В, хотя версия 3.3В тоже работает. Требуется контроллер не ниже 328 (в старые 168 прошивка не влезает). Arduino Nano работает, но требуется доработка.
 
-
-Планы на будущее:
-
-Сделать линию TX для отправки команд, как на наземной станции.
-
-Отправка команды установки "домашней" позиции
-
-Отправка команды отмены маршрута
-
-Отправка команды RTL
-
-===Необходимое оборудование===
-
-[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=26869&aff=233755 Arduino Pro Mini] рекомендуем версию с питанием 5В, хотя версия 3.3В тоже работает.
-
-[http://www.ebay.com/sch/i.html?_odkw=usb+ttl&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR12.TRC2.A0.H0.Xusb+ttl+5v&_nkw=usb+ttl+5v&_sacat=0 USB->TTL 5V convertor] на чипах FTDI, PL2303 или других. Для программирования Arduinio требуется распаянный пин DTE. Не забудьте про USB кабель.
+[http://www.ebay.com/sch/i.html?_odkw=usb+ttl&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR12.TRC2.A0.H0.Xusb+ttl+5v&_nkw=usb+ttl+5v&_sacat=0 USB->TTL 5V convertor] на чипах FTDI, PL2303 или других. Для программирования Arduinio требуется распаянный пин DTE (DTR). Не забудьте про USB кабель.
 
 [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=27990&aff=233755 USBasp AVR programmer] для прошивки аппы Turnigy 9X. Можете использовать любой другой программатор, которым Вы привыкли пользоваться.
 
@@ -68,46 +36,189 @@ Heading - положение носа аппарата. В режиме Disarmed
 
 [http://www.ebay.com/sch/i.html?_odkw=telemetry+cable+for+apm&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.H0.Xtelemetry+cable+apm&_nkw=telemetry+cable+apm&_sacat=0 Telemetry cable for APM] Для тех, кто любит чтобы все было аккуратно и на разъемах, может понравится подобный кабель. Менее дотошные могут припаять 4 провода к разъему телеметрии APM с обратной стороны.
 
+
+Проект содержит две прошивки: одну для Arduino Pro Mini и прошивки для аппы Turnigy 9X для разных контроллеров (MEGA64, MEGA128 и MEGA2561)
+
+Прошивка для Turnigy 9X создана на основе популярной [https://code.google.com/p/er9x/ er9x прошивки r812] (добавлен экран №5 отображения данных, принимаемых от Ardupilot, остальное без изменений)
+
+Прошивка для Arduino основана на проекте [https://github.com/vizual54/APM-Mavlink-to-FrSky APM-Mavlink-to-FrSky for Taranis]
+
+
+===Отображаемые параметры===
+
+Верхняя строка:
+Остаток заряда бортовой батареи (по данным APM)
+Напряжение с [http://store.3drobotics.com/products/apm-power-module-with-xt60-connectors модуля питания]
+Напряжение процессора полетного контроллера
+Напряжение батареи аппы
+
+Левая колонка:
+Arming/Disarming
+GPS: NO Fix, 2D Fix, 3D Fix, DGPS и RTK
+sat  - Количество видимых спутников
+hdop - [http://ru.wikipedia.org/wiki/DOP HDOP] в см
+Индикатор приема данных (heartbeat)
+Отображение "здоровья" (health) сенсоров (если включены): 3D gyro, 3D accelerometer, 3D magnetometer, absolute pressure, differential pressure - air speed, GPS, optical flow, geofence, AHRS subsystem health
+
+Правая колонка:
+Полетный режим (поддерживаются все полетные режимы текущей версии 1.3.3-dev ардукоптера, включая FLIP, AutoTune и PosHold)
+alt  - Высота в метрах по барометру
+gAl  - Высота в метрах по GPS
+dth  - Дистанция до точки взлета (home position)
+wp   - Отображение расстояние до следуещей точки маршрута и ее номер
+thr% - Отображение газа (данные не по положению стика газа, а величина, передаваемая непосредственно на двигатели самим автопилотом)
+
+Отображение 24 сообщений системы уровня SEVERITY_HIGH, включая [http://copter.ardupilot.com/wiki/prearm_safety_check/ PreArm safety check], AutoTune, а также новые ESC Cal, Low Battery и Lost GPS
+
+В центре экрана вы найдете квадрат, за которым прижилось название "Радар" на котором вы увидите:
+Самая длинная линия      - положение носа аппарата. В режиме Disarmed показывает положение носа по компасу (север - вверху). В режиме Arming показывает положение относительно взлета (как в SIMPLE режимах)
+Короткая одинарная линия - направление на текущую точку маршрута
+Короткая тройная линия   - направление на точку взлета (home position)
+Направление "домой" рассчитывается как и расстояние "до дома" по разнице текущих GPS координат и точки взлета (алгоритм тот же, что и в различных OSD).
+
+Нижняя строка:
+RX и TX - уровень сигнала
+cpu     - загрузка процессора полетного контроллера
+Ток в амперах, измеренный [http://store.3drobotics.com/products/apm-power-module-with-xt60-connectors модулем питания]
+
+
 ===Конфигурация оборудования, на которой производилось тестирование===
-[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=31544&aff=233755 Turnigy 9XR Transmitter Mode 2] (подойдет любая другая аппаратура клона Turnigy 9X)
-У вас должен быть сделан так называемый "FrSky hardware MOD". Наиболее оптимальный, на мой взгляд, способ описан [http://forum.rcdesign.ru/blogs/105113/blog16284.html здесь]. Если этот способ вас не устраивает, то привожу ссылки на другие разнообразные инструкции (на английском языке)
-[http://er9x.googlecode.com/svn/trunk/doc/FrSky%20Telemetry%20%20details.pdf 1] [http://code.google.com/p/gruvin9x/wiki/FrskyInterfacing 2] [http://er9x.googlecode.com/svn/trunk/doc/TelemetryMods.pdf 3] [http://www.flickr.com/photos/erezraviv/5830896454/in/photostream 4] [http://er9x.googlecode.com/svn/trunk/doc/FRSKYTelemetry.pdf 5]
 
-[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=14355&aff=233755 FrSky DJT and D8R-IIplus modules] Комплект приемник и модуль для аппы (можете использовать другие модули FrSky с поддеркой телеметрии)
+* [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=31544&aff=233755 Turnigy 9XR Transmitter Mode 2] (подойдет любая другая аппаратура клона Turnigy 9X)
 
-[http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=37328&aff=233755 Ardupilot v2.52 compatible Flight Controller] (или любой другой клон, поддерживающий прошивки[http://ardupilot.com/ APM])
+* [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=14355&aff=233755 FrSky DJT and D8R-IIplus modules] Комплект приемник и модуль для аппы (можете использовать другие модули FrSky с поддеркой телеметрии)
+
+* [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=37328&aff=233755 Ardupilot v2.52 compatible Flight Controller] (или любой другой клон, поддерживающий прошивки[http://ardupilot.com/ APM])
 
 ===Необходимое программное обеспечение===
 [https://code.google.com/p/eepe/ eePe] для прошивки аппы и сохранения/редактирования настроек.
-
 [http://russemotto.com/xloader/ XLoader] (или другая программа, которая позволяет заливать HEX файлы в Arduino) ИЛИ
-[http://arduino.cc/en/Main/Software Arduino IDE] для прошивки Arduino из исходных кодов. При использовании Arduino IDE не забудьте сделать импорт [https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/source/mavlink-driver/libraries библиотек]
+[http://arduino.cc/en/Main/Software Arduino IDE 1.0.6] для прошивки Arduino из исходных кодов. При использовании Arduino IDE не забудьте сделать импорт [https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/source/mavlink-driver/libraries библиотек]
 
-===Скачать последние версии прошивок===
-https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin
+===Порядок действий===
 
-===История изменений===
+# У вас должен быть сделан так называемый "FrSky Hardware Mod" для Turnigy 9X. Наиболее оптимальный, на мой взгляд, способ описан [http://forum.rcdesign.ru/blogs/105113/blog16284.html здесь]. Если этот способ вас не устраивает, то привожу ссылки на другие разнообразные инструкции (на английском языке)
+[http://er9x.googlecode.com/svn/trunk/doc/FrSky%20Telemetry%20%20details.pdf 1] [http://code.google.com/p/gruvin9x/wiki/FrskyInterfacing 2] [http://er9x.googlecode.com/svn/trunk/doc/TelemetryMods.pdf 3] [http://www.flickr.com/photos/erezraviv/5830896454/in/photostream 4] [http://er9x.googlecode.com/svn/trunk/doc/FRSKYTelemetry.pdf 5]
 
-[https://code.google.com/p/er9x-frsky-mavlink/source/browse/#svn/trunk/bin r10]
+# Определяем процессор вашей аппаратуры 64, 128 или 2561 (вскрываем аппу, смотрим через лупу название самой большой микросхемы)
 
-Отображение расстояние до следуещей точки маршрута wp_dist
+# Настраиваем [https://code.google.com/p/eepe/ eePe] правильно указав модель процессора
 
-Отображение здоровья сенсоров (если включены):
+# Сохраняем все настройки аппы в файл с помощью [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=27990&aff=233755 программатора] и [https://code.google.com/p/eepe/ eePe] (Read Memory From TX, Файл - Сохранить как...)
 
-3D gyro
+# Прошиваем аппу прошивкой, соответствующей модели процессора. Для mega64 берем [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/er9x-64.hex эту] прошивку, для mega128 и maga128A [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/er9x-128.hex эту] и для [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/er9x-2561.hex mega2561]
+Перед прошивкой лучше убедиться, что скачанный файл не содержит html-код и т.п. В случае затруднений в скачивании используйте svn (описано ниже в вопросах и ответах) либо используйте прикрепленный файл в наиболее поздних постах в [http://forum.rcdesign.ru/f4/thread364947.html этой] теме на форуме.
 
-3D accelerometer
+# Восстанавливаем настройки аппы из файла, созданного в п.4 (Write Memory To TX)
 
-3D magnetometer
+# Владельцы mega64 этот пункт пропускают, а остальные в настройках аппы идут в Radio Setup (страница 1, в самом низу) "Frsky Mod Done" выставляем в "ON"
 
-absolute pressure
+# На аппе, в настройках модели, на странице 10 Telemetry в первой строке выставляем "Proto FrHub Mav Met"
 
-differential pressure - air speed
+# Идем в просмотр телеметрии и видим, что появилась новая страница № 5 c "радаром" в центре. 
 
-GPS
+# Можно выполнить снова п.4 чтобы после очередной перепрошивки не делать п.7 и п.8. На этом с аппой закончили.
 
-optical flow
+# Прошиваем ардуину 
+  * Способ 1. Собираем прошивку в Arduino IDE из исходных кодов и прошиваем (более подробно процесс описан ниже в вопросах и ответах)
+  * Способ 2. [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/APM_Mavlink_to_FrSky.hex этой] прошивкой с помощью USB-TTL конвертера (убедитесь в наличии линии DTR) и программы [http://russemotto.com/xloader/ XLoader]
 
-geofence
+# Подключаем RX, TX, VCC, GND ардуины к разъему телеметрии APM
 
-AHRS subsystem health
+# Подключаем D5 ардуины к разъему RX приемника (см. рисунок в начале этой страницы)
+
+# Если приемник и ардуина запитаны от разных источников, то соединяем GND ардуины и приемника
+
+# Отключаем от ардуины USB-TTL конвертер
+
+# Подключаем APM к аккумулятору, отключаем USB от APM (при подключенном USB телеметрия не передается)
+
+# Ждем около минуты пока прогрузится APM и ардуина
+
+# На аппе, на 5 экране телеметрии видим полетный режим и остальные параметры
+
+# Profit!
+
+===Вопросы и ответы===
+
+=Вопрос: Как прошить arduino ?=
+Ответ: Существует два способа.
+
+Первый способ - из исходных кодов
+# Качаем [http://arduino.cc/en/Main/Software Arduino IDE 1.0.6]
+# Качаем [https://code.google.com/p/er9x-frsky-mavlink/source/browse/trunk/?r=17#trunk%2Fsource%2Fmavlink-driver исходники], нас интересует папка "mavlink-driver". Для скачивания исходников лучше воспользоваться svn (описание ниже)
+# Заходим в IDE выбираем "Скетч" - "Импортировать библиотеку" - "Add library"
+# Выбираем папку mavlink-driver\libraries\AP_Common\ и далее повторяем с каждой папкой из mavlink-driver\libraries
+# Далее "Файл" - "Открыть" - "APM_Mavlink_to_FrSky.ino"
+# Подключаем Arduino и USB-TTL конвертер к порту USB
+# "Сервис" - "Плата" Выбираем нашу ардуину и "Сервис" - "Порт" - выбираем порт
+# В Arduino IDE в панели инструментов жмете вторую кнопку слева (выглядит как стрелка вправо) - все компилируется и заливается в ардуину
+
+Второй способ - из готового hex файла.
+Берем [http://russemotto.com/xloader/ XLoader] или Arduino Hex Uploader and Programmer и шьем [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/APM_Mavlink_to_FrSky.hex APM_Mavlink_to_FrSky.hex], через USB-TTL конвертер.
+Прочитайте [http://www.getchip.net/posts/104-proshivka-lyubogo-hex-fajjla-v-arduino-pri-pomoshhi-shtatnogo-zagruzchika-bootloader/ это] (раздел про XLoader)
+
+=Вопрос: Как скачать исходники?=
+Ответ:
+# Устанавливаете любой SVN клиент, например [http://www.sliksvn.com/en/download этот]
+# В командной строке "cd \"  - переходим в корень диска
+# В командной строке "svn checkout http://er9x-frsky-mavlink.googlecode.com/svn/trunk/ er9x-frsky-mavlink"
+В корне диска появится папка "er9x-frsky-mavlink" с исходниками
+
+=Вопрос: Чем отличается эта прошивка от обычной er9x?=
+Ответ: это обычная r812 прошивка + 5 экран телеметрии + доп. настройка MAV-STD на 10 экране настройки модели.
+В режиме Mav включается 5 экран телеметрии, в режиме Std - это полностью r812 er9x
+
+=Вопрос: Чем отличаются прошивки между собой?=
+Ответ: Версия для mega64 - урезанная.
+Из стандартной 812 прошивки полностью убраны HELI и TEMPLATES, в моих доработках все направления считаются с высокой погрешностью, отключена индикация "здоровья" сенсоров, полностью отключена система передачи сообщений (PreArm и остальные)
+mega128 и mega2561 идентичны (по возможностям)
+
+
+=Вопрос: Как реализовано управление подсветкой?=
+Ответ: Если вам нужно только управление подсветкой, то просто подключите ардуину, прошитую нашей прошивкой к порту телеметрии и ваш квадрик будет мигать в зависимости от полетного режима.
+
+ВНИМАНИЕ!
+Обычные светодиоды можно подключать к ардуине только через токоограничивающие резисторы, а яркие светодиоды, светодиодные ленты и т.п. напрямую к ардуине подключать нельзя (ардуина выдерживает ток только до 20 миллиампер на один контакт и 200 на все устройство). За консультацией по подключению ярких светодиодов и лент к ардуине обращайтесь к спецам по электронике.
+
+4 канала подсветки на лучи: FRONT (arduino pin 7), REAR - 8, LEFT - 9, RIGHT - 10.
+Подсветка настраивается по "паттернам" (об этом ниже)
+
+4 канала для цветных светодиодов вроде [http://ru.aliexpress.com/premium/3W-4LEDs-APM.html?ltype=wholesale&SearchText=3W+4LEDs+APM&d=y&origin=y&initiative_id=SB_20141005022206&catId=&isViewCP=y&LocalSearchText=3W+4LEDs+APM&enSearchText=3W+4LEDs+APM этих]
+Белый светодиод (pin 2) включается при арминге
+Голубой светодиод (pin 3) включается при 3D Fix и hdop <= 200
+Красный светодиод (pin 4) включается при получении любого сообщения от APM уровня CRITICAL
+Зеленый светодиод (pin 13) и светодиод на ардуине повторяют светодиоды переднего луча
+
+По паттернам. Подсветка настраивается только в исходниках, настраивать через специальную программу как в jd IO_Board возможности нет, PWM тоже не реализовано (т.е. нельзя плавно включать-выключать светодиоды)
+В файле APM_Mavlink_to_FrSky.ino начиная где-то со строки 60 вы найдете код:
+
+{{{
+char LEFT_STAB[]   PROGMEM = "1111111110";   // pattern for LEFT  light, mode - STAB
+char RIGHT_STAB[]  PROGMEM = "1111111110";   // pattern for RIGHT light, mode - STAB
+char FRONT_STAB[]  PROGMEM = "1111111110";   // pattern for FRONT light, mode - STAB
+char REAR_STAB[]   PROGMEM = "1111111110";   // pattern for REAR  light, mode - STAB
+
+char LEFT_AHOLD[]  PROGMEM = "111000";  // medium blink
+char RIGHT_AHOLD[] PROGMEM = "111000"; 
+char FRONT_AHOLD[] PROGMEM = "111000"; 
+char REAR_AHOLD[]  PROGMEM = "111000"; 
+
+char LEFT_RTL[]    PROGMEM = "10";  // fast blink
+char RIGHT_RTL[]   PROGMEM = "10"; 
+char FRONT_RTL[]   PROGMEM = "10"; 
+char REAR_RTL[]    PROGMEM = "10"; 
+
+char LEFT_OTHER[]  PROGMEM = "1";  // always ON
+char RIGHT_OTHER[] PROGMEM = "1"; 
+char FRONT_OTHER[] PROGMEM = "1"; 
+char REAR_OTHER[]  PROGMEM = "1";
+}}}
+
+Первая строка - это настройка подсветки левого луча в режиме STABILIZE. Один символ в строке - это 0,1сек времени. По умолчанию сейчас 0,9сек подсветка горит, затем на 0,1сек тухнет для всех лучей. Соответственно, строка типа "1111100000" будет означать 0,5сек вкл затем 0,5сек выкл, строка "01" 0,1сек выкл затем 0,1сек вкл и т.д. Строки могут быть разной длины. Суммарная длина всех таких строк ограничена размером флеш памяти на ардуине. Для подсветки осталось около 500 байт - довольно много.
+Сейчас реализована настройка подсветки в четырех режимах: stab, althold, rtl и все остальные. Каждый из четырех лучей настраивается индивидуально.
+
+Подсветка по умолчанию сейчас: STAB - медленно мигает (0.9+0.1),
+ALTHOLD - средне (0,3+0,3), RTL - быстро (0,1+0,1), на остальных режимах горит постоянно.
+
+Настройка на большее количество полетных режимов описана [http://forum.rcdesign.ru/f4/thread364947-5.html#post5309013 тут]
