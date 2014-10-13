@@ -286,8 +286,8 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 			frskyBuffer[bufferLength + 7] = msByte(temp);
 			return 8;
 		}
-/*
 		break;
+/*
 		case DATE :
 		{
 			frskyBuffer[bufferLength] = header_value;
