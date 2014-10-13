@@ -18,16 +18,16 @@
 
 ===Вам подойдет это решение, если Вы счастливый владелец следующего оборудования:===
 
- # Полетный контроллер c прошивкой [http://copter.ardupilot.com APM:Copter] или клон
+ 1. Полетный контроллер c прошивкой [http://copter.ardupilot.com APM:Copter] или клон
 
- # Приемник FrSky с поддержкой телеметрии [http://www.frsky-rc.com/product/category.php?cate_id=16 D серии] ([http://www.frsky-rc.com/product/category.php?cate_id=17 S серия] с протоколом SPort не поддерживается)
+ 2. Приемник FrSky с поддержкой телеметрии [http://www.frsky-rc.com/product/category.php?cate_id=16 D серии] ([http://www.frsky-rc.com/product/category.php?cate_id=17 S серия] с протоколом SPort не поддерживается)
 
- # ВЧ модуль передатчика FrSky [http://www.frsky-rc.com/product/category.php?cate_id=14 D серии]
+ 3. ВЧ модуль передатчика FrSky [http://www.frsky-rc.com/product/category.php?cate_id=14 D серии]
 
- # Аппаратура [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=31544&aff=233755 Turnigy 9XR] или любой другой клон 9X
+ 4. Аппаратура [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=31544&aff=233755 Turnigy 9XR] или любой другой клон 9X
 
 
-=APM -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky=
+===APM -> Arduino Pro Mini -> FrSky приемник -> Turnigy 9X с ВЧ модулем FrSky===
 
 https://er9x-frsky-mavlink.googlecode.com/svn/trunk/mavlink-frsky.jpg
 
@@ -74,7 +74,7 @@ GPS: NO Fix, 2D Fix, 3D Fix, DGPS и RTK
 
 sat  - Количество видимых спутников
 
-hdop - [http://ru.wikipedia.org/wiki/DOP HDOP] в см
+hdop - [http://ru.wikipedia.org/wiki/DOP HDOP] в метрах
 
 Индикатор приема данных (heartbeat)
 
@@ -140,7 +140,7 @@ cpu - загрузка процессора полетного контролл�
 
 4. Сохраняем все настройки аппы в файл с помощью [http://www.hobbyking.com/hobbyking/store/uh_viewitem.asp?idproduct=27990&aff=233755 программатора] и [https://code.google.com/p/eepe/ eePe] (Read Memory From TX, Файл - Сохранить как...)
 
-5. Прошиваем аппу прошивкой, соответствующей модели процессора. Для mega64 берем [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/er9x-64.hex эту] прошивку, для mega128 и maga128A [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/er9x-128.hex эту] и для [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/er9x-2561.hex mega2561]
+5. Прошиваем аппу прошивкой, соответствующей модели процессора. Для mega64 берем [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/er9x-64.hex эту] прошивку, для mega128 и maga128A [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/er9x-128.hex эту] и для [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/er9x-2561.hex mega2561]
 Перед прошивкой лучше убедиться, что скачанный файл не содержит html-код и т.п. В случае затруднений в скачивании используйте svn (описано ниже в вопросах и ответах) либо используйте прикрепленный файл в наиболее поздних постах в [http://forum.rcdesign.ru/f4/thread364947.html этой] теме на форуме.
 
 6. Восстанавливаем настройки аппы из файла, созданного в п.4 (Write Memory To TX)
@@ -155,7 +155,7 @@ cpu - загрузка процессора полетного контролл�
 
 11. Прошиваем ардуину 
   * Способ 1. Собираем прошивку в Arduino IDE из исходных кодов и прошиваем (более подробно процесс описан ниже в вопросах и ответах)
-  * Способ 2. [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/APM_Mavlink_to_FrSky.hex этой] прошивкой с помощью USB-TTL конвертера (убедитесь в наличии линии DTR) и программы [http://russemotto.com/xloader/ XLoader]
+  * Способ 2. [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/APM_Mavlink_to_FrSky.hex этой] прошивкой с помощью USB-TTL конвертера (убедитесь в наличии линии DTR) и программы [http://russemotto.com/xloader/ XLoader]
 
 12. Подключаем RX, TX, VCC, GND ардуины к разъему телеметрии APM
 
@@ -179,25 +179,25 @@ cpu - загрузка процессора полетного контролл�
 Ответ: Существует два способа.
 
 Первый способ - из исходных кодов
-# Качаем [http://arduino.cc/en/Main/Software Arduino IDE 1.0.6]
+1. Качаем [http://arduino.cc/en/Main/Software Arduino IDE 1.0.6]
 
-# Качаем [https://code.google.com/p/er9x-frsky-mavlink/source/browse/trunk/?r=17#trunk%2Fsource%2Fmavlink-driver исходники], нас интересует папка "mavlink-driver". Для скачивания исходников лучше воспользоваться svn (описание ниже)
+2. Качаем [https://code.google.com/p/er9x-frsky-mavlink/source/browse/trunk/?r=17#trunk%2Fsource%2Fmavlink-driver исходники], нас интересует папка "mavlink-driver". Для скачивания исходников лучше воспользоваться svn (описание ниже)
 
-# Заходим в IDE выбираем "Скетч" - "Импортировать библиотеку" - "Add library"
+3. Заходим в IDE выбираем "Скетч" - "Импортировать библиотеку" - "Add library"
 
-# Выбираем папку mavlink-driver\libraries\AP_Common\ и далее повторяем с каждой папкой из mavlink-driver\libraries
+4. Выбираем папку mavlink-driver\libraries\AP_Common\ и далее повторяем с каждой папкой из mavlink-driver\libraries
 
-# Далее "Файл" - "Открыть" - "APM_Mavlink_to_FrSky.ino"
+5. Далее "Файл" - "Открыть" - "APM_Mavlink_to_FrSky.ino"
 
-# Подключаем Arduino и USB-TTL конвертер к порту USB
+6. Подключаем Arduino и USB-TTL конвертер к порту USB
 
-# "Сервис" - "Плата" Выбираем нашу ардуину и "Сервис" - "Порт" - выбираем порт
+7. "Сервис" - "Плата" Выбираем нашу ардуину и "Сервис" - "Порт" - выбираем порт
 
-# В Arduino IDE в панели инструментов жмете вторую кнопку слева (выглядит как стрелка вправо) - все компилируется и заливается в ардуину
+8. В Arduino IDE в панели инструментов жмете вторую кнопку слева (выглядит как стрелка вправо) - все компилируется и заливается в ардуину
 
 Второй способ - из готового hex файла.
 
-Берем [http://russemotto.com/xloader/ XLoader] или Arduino Hex Uploader and Programmer и шьем [https://er9x-frsky-mavlink.googlecode.com/svn-history/r17/trunk/bin/APM_Mavlink_to_FrSky.hex APM_Mavlink_to_FrSky.hex], через USB-TTL конвертер.
+Берем [http://russemotto.com/xloader/ XLoader] или Arduino Hex Uploader and Programmer и шьем [https://er9x-frsky-mavlink.googlecode.com/svn/trunk/bin/APM_Mavlink_to_FrSky.hex APM_Mavlink_to_FrSky.hex], через USB-TTL конвертер.
 
 Прочитайте [http://www.getchip.net/posts/104-proshivka-lyubogo-hex-fajjla-v-arduino-pri-pomoshhi-shtatnogo-zagruzchika-bootloader/ это] (раздел про XLoader)
 
