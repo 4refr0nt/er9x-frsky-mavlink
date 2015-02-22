@@ -8,6 +8,8 @@
 [http://openrcforums.com/forum/viewtopic.php?f=5&t=5485&p=87943 openrcforums.com] на английском
 
 
+[https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7EERYFP7D2K7Q&lc=US&item_name=FrSky%2dMavlink%20converter%20for%20er9x&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif]
+
 Этот проект позволяет пилотам отображать специфичные для Ardupilot (APM) данные на экране аппы Turnigy 9X и ее клонов без использования дополнительного радиоканала телеметрии на базе 3DR Radio или XBee. Передача данных происходит по радиоканалу телеметрии, реализованной в приемниках и ВЧ модулях FrSky. Для владельцев 3DR Radio или XBee появляется возможность отображения телеметрии как на наземной станции, так и на экране аппы.
 Телеметрия на страницах 1-4 отображает стандартные данные FrSky, включая данные хаба FrSky (за исключением temp1 и temp2)
 Успешно работает совместно с OSD и 3DR Radio.
