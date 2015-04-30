@@ -444,7 +444,7 @@
 /* Extra data for MavLink via FrSky
 //
 // Auto Pilot modes from ArduPlane
-// https://github.com/diydrones/arduplane/blob/master/ArduCopter/defines.h
+// https://github.com/diydrones/ardupilot/blob/master/ArduPlane/defines.h
 // Auto Pilot modes.
 // actual data for version V3.2.3-master
 // ----------------
