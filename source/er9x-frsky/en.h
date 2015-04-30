@@ -439,6 +439,59 @@
 #define STR_MAV_DISARMED  	 "DISARM"
 #define STR_MAV_NODATA 		 "NODATA"
 #define STR_MAV_GPS_NO_GPS   "No GPS"
+
+
+/* Extra data for MavLink via FrSky
+//
+// Auto Pilot modes from ArduPlane
+// https://github.com/diydrones/arduplane/blob/master/ArduCopter/defines.h
+// Auto Pilot modes.
+// actual data for version V3.2.3-master
+// ----------------
+#define STABILIZE 0                     // hold level position
+#define ACRO 1                          // rate control
+#define ALT_HOLD 2                      // AUTO control
+#define AUTO 3                          // AUTO control
+#define GUIDED 4                        // AUTO control
+#define LOITER 5                        // Hold a single location
+#define RTL 6                           // AUTO control
+#define CIRCLE 7                        // AUTO control
+#define LAND 9                          // AUTO control
+#define OF_LOITER 10                    // Hold a single location using optical flow sensor
+#define DRIFT 11                        // DRIFT mode (Note: 12 is no longer used)
+#define SPORT 13                        // earth frame rate control
+#define FLIP        14                  // flip the vehicle on the roll axis
+#define AUTOTUNE    15                  // autotune the vehicle's roll and pitch gains
+#define POSHOLD     16                  // position hold with manual override
+
+#define STR_MAV_FM_0     	 "MANUAL"
+#define STR_MAV_FM_1     	 "CIRCLE"
+#define STR_MAV_FM_2     	 "STABLIZ"
+#define STR_MAV_FM_3     	 "TRAIN"
+#define STR_MAV_FM_4     	 "ACRO"
+#define STR_MAV_FM_5     	 "FBWA"
+#define STR_MAV_FM_6   		 "FBWB"
+#define STR_MAV_FM_7     	 "CRUISE"
+#define STR_MAV_FM_8     	 "ATune"
+#define STR_MAV_FM_9 		 "AUTO"
+#define STR_MAV_FM_10     	 "RTL"
+#define STR_MAV_FM_11		 "LOITER"
+#define STR_MAV_FM_12     	 "GUIDED"
+#define STR_MAV_FM_13		 "INIT"
+#define STR_MAV_FM_14		 "MODE14"
+#define STR_MAV_FM_15 		 "MODE15"
+#define STR_MAV_FM_16 		 "MODE16"
+#define STR_MAV_FM_17     	 "MODE17"
+#define STR_MAV_FM_18     	 "MODE18"
+#define STR_MAV_FM_19     	 "MODE19"
+#define STR_MAV_FM_98 		 "NO DRV"
+#define STR_MAV_FM_99 		 "NO MAV"
+#define STR_MAV_ARMED  		 "ARMED"
+#define STR_MAV_DISARMED  	 "DISARM"
+#define STR_MAV_NODATA 		 "NODATA"
+#define STR_MAV_GPS_NO_GPS   "No GPS"
+*/
+
 // GPS modes see https://github.com/diydrones/ardupilot/search?q=mavlink_msg_gps_raw_int_get_fix_type
 #define STR_MAV_GPS_NO_FIX	 "No Fix" // 1
 #define STR_MAV_GPS_2DFIX	 "2D Fix" // 2
